@@ -33,13 +33,13 @@ def name_gender(names):
     for name in names:
         gender = get_decision(primary_guesser, name)
         if gender in ["male", "female", "both"]:
-            name_genders.append({name: gender})
+            name_genders.append(gender)
         else:
             gender = get_decision(secondary_guesser, name)
             if gender in ["male", "female", "both"]:
-                name_genders.append({name: gender})
+                name_genders.append(gender)
             else:
-                name_genders.append({name: 'unknown'})
+                name_genders.append('unknown')
     return name_genders
 
 
@@ -129,5 +129,6 @@ def statistics(data):
 
 
 def training_mean(gender):
+    #returns mean stars for each gender
     return statistics(data)[gender][1][0]
 
