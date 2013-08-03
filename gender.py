@@ -70,17 +70,14 @@ def unknown_data(data):
     unknown_zip = list(zip(*gender_tuples(data)[2]))
     unknown_reviews = list(unknown_zip[0])
     unknown_stars = list(unknown_zip[1])
+    return {'review_count': unknown_reviews, 'average_stars': unknown_stars}
 
-unknown_zip = list(zip(*gender_tuples(data)[2]))
-unknown_x = list(unknown_zip[0])
-unknown_y = list(unknown_zip[1])
-
-mean_female_x = np.mean(female_x)
+mean_female_x = np.mean(female_data(data)['review_count'])
 #sample variance for mean of sample
-var_female_x = np.var(female_x)/(len(female_x)-1)
+var_female_x = np.var(female_data(data)['review_count'])/(len(female_data(data)['review_count'])-1)
 
-mean_female_y = np.mean(female_y)
-var_female_y = np.var(female_y)/(len(female_y)-1)
+mean_female_y = np.mean(female_data(data)['review_count'])
+var_female_y = np.var(female_data(data)['average_stars'])/(len(female_data(data)['average_stars'])-1)
 
 mean_male_x = np.mean(male_x)
 var_male_x = np.var(male_x)/(len(male_x)-1)
