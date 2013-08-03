@@ -24,7 +24,7 @@ def genders(user_ids):
 
 
 def gender_means(gender_list):
-    return [gender.training_mean(gender) for gender in gender_list]
+    return [gender.training_mean(id_gender) for id_gender in gender_list]
 
 
 def main():
