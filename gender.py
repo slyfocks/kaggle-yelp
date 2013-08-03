@@ -62,7 +62,8 @@ def data_genders(data):
 def gender_tuples(data):
     return [[list(entry.keys())[0] for entry in data_genders(data) if list(entry.values())[0] == 'female'],
             [list(entry.keys())[0] for entry in data_genders(data) if list(entry.values())[0] == 'male'],
-            [list(entry.keys())[0] for entry in data_genders(data) if list(entry.values())[0] == 'unknown']]
+            [list(entry.keys())[0] for entry in data_genders(data) if list(entry.values())[0] == 'unknown'],
+            [list(entry.keys())[0] for entry in data_genders(data) if list(entry.values())[0] == 'both']]
 
 
 def female_data(data):
@@ -86,6 +87,13 @@ def unknown_data(data):
     return {'review_count': unknown_reviews, 'average_stars': unknown_stars}
 
 
+def both_data(data):
+    both_zip = list(zip(*gender_tuples(data)[3]))
+    both_reviews = list(both_zip[0])
+    both_stars = list(both_zip[1])
+    return {'review_count': both_reviews, 'average_stars': both_stars}
+
+
 def statistics(data):
     mean_female_x = np.mean(female_data(data)['review_count'])
     #sample variance for mean of sample
@@ -101,14 +109,20 @@ def statistics(data):
     std_male_y = np.std(male_data(data)['average_stars'])/(len(male_data(data)['average_stars'])-1)
 
     mean_unknown_x = np.mean(unknown_data(data)['review_count'])
-    #sample variance for mean of sample
     std_unknown_x = np.std(unknown_data(data)['review_count'])/(len(unknown_data(data)['review_count'])-1)
 
     mean_unknown_y = np.mean(unknown_data(data)['review_count'])
     std_unknown_y = np.std(unknown_data(data)['average_stars'])/(len(unknown_data(data)['average_stars'])-1)
+
+    mean_both_x = np.mean(both_data(data)['review_count'])
+    std_both_x = np.std(both_data(data)['review_count'])/(len(both_data(data)['review_count'])-1)
+
+    mean_both_y = np.mean(both_data(data)['review_count'])
+    std_both_y = np.std(both_data(data)['average_stars'])/(len(both_data(data)['average_stars'])-1)
     return {'female': [(mean_female_x, std_female_x), (mean_female_y, std_female_y)],
             'male': [(mean_male_x, std_male_x), (mean_male_y, std_male_y)],
-            'unknown': [(mean_unknown_x, std_unknown_x), (mean_unknown_y, std_unknown_y)]}
+            'unknown': [(mean_unknown_x, std_unknown_x), (mean_unknown_y, std_unknown_y)],
+            'both': [(mean_both_x, std_both_x), (mean_both_y, std_both_y)]}
 
 
 def training_mean(gender):
