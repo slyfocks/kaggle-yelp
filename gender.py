@@ -30,7 +30,6 @@ def name_genders(data):
     # Give precedence to us_census data.
     primary_guesser = NameGender("gender_guesser/us_census_1990_males", "gender_guesser/us_census_1990_females")
     secondary_guesser = NameGender("gender_guesser/popular_1960_2010_males", "gender_guesser/popular_1960_2010_females")
-    web_guesser = None
     name_genders = []
     for entry in data:
         name = entry['name'].strip().lower()
@@ -76,40 +75,24 @@ def unknown_data(data):
 def statistics(data):
     mean_female_x = np.mean(female_data(data)['review_count'])
     #sample variance for mean of sample
-    var_female_x = np.var(female_data(data)['review_count'])/(len(female_data(data)['review_count'])-1)
+    std_female_x = np.std(female_data(data)['review_count'])/(len(female_data(data)['review_count'])-1)
+
     mean_female_y = np.mean(female_data(data)['review_count'])
-    var_female_y = np.var(female_data(data)['average_stars'])/(len(female_data(data)['average_stars'])-1)
-    return {'female': [(mean_female_x, var_female_x), (mean_female_y, var_female_y)],
-            'male': [(mean_male_x, var_male_x), (mean_male_y, var_male_y)]}
+    std_female_y = np.std(female_data(data)['average_stars'])/(len(female_data(data)['average_stars'])-1)
 
+    mean_male_x = np.mean(male_data(data)['review_count'])
+    std_male_x = np.std(male_data(data)['review_count'])/(len(male_data(data)['review_count'])-1)
 
-mean_male_x = np.mean(male_x)
-var_male_x = np.var(male_x)/(len(male_x)-1)
+    mean_male_y = np.mean(male_data(data)['review_count'])
+    std_male_y = np.std(male_data(data)['average_stars'])/(len(male_data(data)['average_stars'])-1)
 
-mean_male_y = np.mean(male_y)
-var_male_y = np.var(male_y)/(len(male_y)-1)
+    mean_unknown_x = np.mean(unknown_data(data)['review_count'])
+    #sample variance for mean of sample
+    std_unknown_x = np.std(unknown_data(data)['review_count'])/(len(unknown_data(data)['review_count'])-1)
 
-mean_unknown_x = np.mean(unknown_x)
-var_unknown_x = np.var(unknown_x)/(len(unknown_x)-1)
+    mean_unknown_y = np.mean(unknown_data(data)['review_count'])
+    std_unknown_y = np.std(unknown_data(data)['average_stars'])/(len(unknown_data(data)['average_stars'])-1)
+    return {'female': [(mean_female_x, std_female_x), (mean_female_y, std_female_y)],
+            'male': [(mean_male_x, std_male_x), (mean_male_y, std_male_y)],
+            'unknown': [(mean_unknown_x, std_unknown_x), (mean_unknown_y, std_unknown_y)]}
 
-mean_unknown_y = np.mean(unknown_y)
-var_unknown_y = np.var(unknown_y)/(len(unknown_y)-1)
-
-print(mean_male_x)
-print(mean_male_y)
-print(mean_female_x)
-print(mean_female_y)
-print(mean_unknown_x)
-print(mean_unknown_y)
-print(np.sqrt(var_male_x))
-print(np.sqrt(var_male_y))
-print(np.sqrt(var_female_x))
-print(np.sqrt(var_female_y))
-print(np.sqrt(var_unknown_x))
-print(np.sqrt(var_unknown_y))
-print(np.mean(stars))
-print(np.mean(reviews))
-print(np.std(stars))
-print(np.std(reviews))
-'''plt.scatter(female_y, female_x)
-plt.show()'''
