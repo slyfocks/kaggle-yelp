@@ -26,21 +26,18 @@ def get_decision(guesser, name):
         return "unknown"
 
 
-def name_genders(names):
+def name_gender(name):
     primary_guesser = NameGender("gender_guesser/us_census_1990_males", "gender_guesser/us_census_1990_females")
     secondary_guesser = NameGender("gender_guesser/popular_1960_2010_males", "gender_guesser/popular_1960_2010_females")
-    name_genders = []
-    for name in names:
-        gender = get_decision(primary_guesser, name)
+    gender = get_decision(primary_guesser, name)
+    if gender in ["male", "female", "both"]:
+        return gender
+    else:
+        gender = get_decision(secondary_guesser, name)
         if gender in ["male", "female", "both"]:
-            name_genders.append(gender)
+            return gender
         else:
-            gender = get_decision(secondary_guesser, name)
-            if gender in ["male", "female", "both"]:
-                name_genders.append(gender)
-            else:
-                name_genders.append('unknown')
-    return name_genders
+            return 'unknown'
 
 
 def data_genders(data):
@@ -52,13 +49,13 @@ def data_genders(data):
         name = entry['name'].strip().lower()
         gender = get_decision(primary_guesser, name)
         if gender in ["male", "female", "both"]:
-            name_genders.append({(entry['review_count'], entry['average_stars']): gender})
+            dict_genders.append({(entry['review_count'], entry['average_stars']): gender})
         else:
             gender = get_decision(secondary_guesser, name)
             if gender in ["male", "female", "both"]:
-                name_genders.append({(entry['review_count'], entry['average_stars']): gender})
+                dict_genders.append({(entry['review_count'], entry['average_stars']): gender})
             else:
-                name_genders.append({(entry['review_count'], entry['average_stars']): 'unknown'})
+                dict_genders.append({(entry['review_count'], entry['average_stars']): 'unknown'})
     return dict_genders
 
 
@@ -112,4 +109,8 @@ def statistics(data):
     return {'female': [(mean_female_x, std_female_x), (mean_female_y, std_female_y)],
             'male': [(mean_male_x, std_male_x), (mean_male_y, std_male_y)],
             'unknown': [(mean_unknown_x, std_unknown_x), (mean_unknown_y, std_unknown_y)]}
+
+
+def training_mean(gender):
+    return statistics(data)[gender][1][0]
 
