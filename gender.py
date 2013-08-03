@@ -26,18 +26,21 @@ def get_decision(guesser, name):
         return "unknown"
 
 
-def name_gender(name):
+def name_gender(names):
     primary_guesser = NameGender("gender_guesser/us_census_1990_males", "gender_guesser/us_census_1990_females")
     secondary_guesser = NameGender("gender_guesser/popular_1960_2010_males", "gender_guesser/popular_1960_2010_females")
-    gender = get_decision(primary_guesser, name)
-    if gender in ["male", "female", "both"]:
-        return gender
-    else:
-        gender = get_decision(secondary_guesser, name)
+    name_genders = []
+    for name in names:
+        gender = get_decision(primary_guesser, name)
         if gender in ["male", "female", "both"]:
-            return gender
+            name_genders.append({name: gender})
         else:
-            return 'unknown'
+            gender = get_decision(secondary_guesser, name)
+            if gender in ["male", "female", "both"]:
+                name_genders.append({name: gender})
+            else:
+                name_genders.append({name: 'unknown'})
+    return name_genders
 
 
 def data_genders(data):
