@@ -72,12 +72,16 @@ def unknown_data(data):
     unknown_stars = list(unknown_zip[1])
     return {'review_count': unknown_reviews, 'average_stars': unknown_stars}
 
-mean_female_x = np.mean(female_data(data)['review_count'])
-#sample variance for mean of sample
-var_female_x = np.var(female_data(data)['review_count'])/(len(female_data(data)['review_count'])-1)
 
-mean_female_y = np.mean(female_data(data)['review_count'])
-var_female_y = np.var(female_data(data)['average_stars'])/(len(female_data(data)['average_stars'])-1)
+def statistics(data):
+    mean_female_x = np.mean(female_data(data)['review_count'])
+    #sample variance for mean of sample
+    var_female_x = np.var(female_data(data)['review_count'])/(len(female_data(data)['review_count'])-1)
+    mean_female_y = np.mean(female_data(data)['review_count'])
+    var_female_y = np.var(female_data(data)['average_stars'])/(len(female_data(data)['average_stars'])-1)
+    return {'female': [(mean_female_x, var_female_x), (mean_female_y, var_female_y)],
+            'male': [(mean_male_x, var_male_x), (mean_male_y, var_male_y)]}
+
 
 mean_male_x = np.mean(male_x)
 var_male_x = np.var(male_x)/(len(male_x)-1)
