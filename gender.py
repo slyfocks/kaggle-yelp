@@ -26,11 +26,28 @@ def get_decision(guesser, name):
         return "unknown"
 
 
-def name_genders(data):
-    # Give precedence to us_census data.
+def name_genders(names):
     primary_guesser = NameGender("gender_guesser/us_census_1990_males", "gender_guesser/us_census_1990_females")
     secondary_guesser = NameGender("gender_guesser/popular_1960_2010_males", "gender_guesser/popular_1960_2010_females")
     name_genders = []
+    for name in names:
+        gender = get_decision(primary_guesser, name)
+        if gender in ["male", "female", "both"]:
+            name_genders.append(gender)
+        else:
+            gender = get_decision(secondary_guesser, name)
+            if gender in ["male", "female", "both"]:
+                name_genders.append(gender)
+            else:
+                name_genders.append('unknown')
+    return name_genders
+
+
+def data_genders(data):
+    # Give precedence to us_census data.
+    primary_guesser = NameGender("gender_guesser/us_census_1990_males", "gender_guesser/us_census_1990_females")
+    secondary_guesser = NameGender("gender_guesser/popular_1960_2010_males", "gender_guesser/popular_1960_2010_females")
+    dict_genders = []
     for entry in data:
         name = entry['name'].strip().lower()
         gender = get_decision(primary_guesser, name)
@@ -42,13 +59,13 @@ def name_genders(data):
                 name_genders.append({(entry['review_count'], entry['average_stars']): gender})
             else:
                 name_genders.append({(entry['review_count'], entry['average_stars']): 'unknown'})
-    return name_genders
+    return dict_genders
 
 
 def gender_tuples(data):
-    return [[list(entry.keys())[0] for entry in name_genders(data) if list(entry.values())[0] == 'female'],
-            [list(entry.keys())[0] for entry in name_genders(data) if list(entry.values())[0] == 'male'],
-            [list(entry.keys())[0] for entry in name_genders(data) if list(entry.values())[0] == 'unknown']]
+    return [[list(entry.keys())[0] for entry in data_genders(data) if list(entry.values())[0] == 'female'],
+            [list(entry.keys())[0] for entry in data_genders(data) if list(entry.values())[0] == 'male'],
+            [list(entry.keys())[0] for entry in data_genders(data) if list(entry.values())[0] == 'unknown']]
 
 
 def female_data(data):
