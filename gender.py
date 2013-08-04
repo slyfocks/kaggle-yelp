@@ -15,10 +15,6 @@ stars = [member['average_stars'] for member in stars_reviews]
 reviews = [member['review_count'] for member in stars_reviews]
 
 
-def id_stars():
-    return {member['user_id']: member['average_stars'] for member in data}
-
-
 def get_decision(guesser, name):
     m, f = guesser.get_gender_scores(name)
     if m > 0.8:
@@ -29,6 +25,14 @@ def get_decision(guesser, name):
         return "both"
     else:
         return "unknown"
+
+
+def id_stars():
+    return {member['user_id']: member['average_stars'] for member in data}
+
+
+def id_reviews():
+    return {member['user_id']: member['review_count'] for member in data}
 
 
 def name_gender(names):
