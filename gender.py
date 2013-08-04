@@ -13,7 +13,10 @@ sorted_stars_reviews = sorted(stars_reviews, key=lambda x: x.keys())
 names = [member['name'] for member in data]
 stars = [member['average_stars'] for member in stars_reviews]
 reviews = [member['review_count'] for member in stars_reviews]
-id_stars = {member['user_id']: member['average_stars'] for member in data}
+
+
+def id_stars():
+    return {member['user_id']: member['average_stars'] for member in data}
 
 
 def get_decision(guesser, name):
