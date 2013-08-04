@@ -1,6 +1,7 @@
 __author__ = 'slyfocks'
 import json
 import numpy as np
+import csv
 import gender
 #right now the code is agnostic to business data. coming shortly...
 with open('yelp_test_set_user.json') as file:
@@ -13,23 +14,48 @@ with open('yelp_test_set_review.json') as file:
 user_ids = [entry['user_id'] for entry in review_data]
 
 
-def genders(user_ids):
-    genders = []
+def names(user_ids):
+    names = []
     for user_id in user_ids:
         try:
-            genders.append(gender.name_gender(id_names[user_id]))
+            names.append(id_names[user_id])
         except KeyError:
-            genders.append('unknown')
-    return genders
+            names.append('unknown')
+    return names
+
+
+#returns list of genders
+def genders(names):
+    name_list = names
+    return gender.name_gender(name_list)
 
 
 def gender_means(gender_list):
-    return [gender.training_mean(id_gender) for id_gender in gender_list]
+    female_mean_stars = gender.training_mean('female')
+    male_mean_stars = gender.training_mean('male')
+    unknown_mean_stars = gender.training_mean('unknown')
+    both_mean_stars = gender.training_mean('both')
+    gender_means = []
+    for index, id_gender in enumerate(gender_list):
+        if id_gender == 'female':
+            gender_means.append({'RecommendationId': index+1, 'Stars': female_mean_stars})
+        elif id_gender == 'male':
+            gender_means.append({'RecommendationId': index+1, 'Stars': male_mean_stars})
+        elif id_gender == 'unknown':
+            gender_means.append({'RecommendationId': index+1, 'Stars': unknown_mean_stars})
+        else:
+            gender_means.append({'RecommendationId': index+1, 'Stars': both_mean_stars})
+    return gender_means
 
 
 def main():
-    ratings_array = np.asarray(gender_means(genders(user_ids)))
-    np.savetxt('ratings.csv', ratings_array, delimeter=',')
+    name_list = names(user_ids)
+    ratings_array = gender_means(genders(name_list))
+    keys = ['RecommendationId', 'Stars']
+    f = open('people.csv', 'w')
+    dict_writer = csv.DictWriter(f, keys)
+    dict_writer.writer.writerow(keys)
+    dict_writer.writerows(ratings_array)
 
 if __name__ == '__main__':
     main()
