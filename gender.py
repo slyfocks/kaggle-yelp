@@ -55,14 +55,12 @@ def id_gender():
         gender = get_decision(primary_guesser, name)
         if gender in ["male", "female", "both"]:
             id_gender[member['user_id']] = gender
-            i += 1
         else:
             gender = get_decision(secondary_guesser, name)
             if gender in ["male", "female", "both"]:
                 id_gender[member['user_id']] = gender
             else:
                 id_gender[member['user_id']] = 'unknown'
-                j+=1
     return id_gender
 
 
