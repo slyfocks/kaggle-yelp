@@ -4,6 +4,7 @@ import numpy as np
 from gender_guesser.name_gender import NameGender
 from pandas import *
 import matplotlib.pyplot as plt
+import pylab
 with open('yelp_training_set_user.json') as file:
     data = [json.loads(line) for line in file]
 stars_reviews = [{'average_stars': member['average_stars'], 'review_count': member['review_count']} for member in data]
@@ -12,6 +13,7 @@ sorted_stars_reviews = sorted(stars_reviews, key=lambda x: x.keys())
 names = [member['name'] for member in data]
 stars = [member['average_stars'] for member in stars_reviews]
 reviews = [member['review_count'] for member in stars_reviews]
+id_stars = {member['user_id']: member['average_stars'] for member in data}
 
 
 def get_decision(guesser, name):
