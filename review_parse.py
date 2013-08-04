@@ -49,12 +49,16 @@ def gender_grades():
 
 def gender_average_grade():
     grades = gender_grades()
+
     female_average = sum(grades['female'])/len(grades['female'])
     female_std = np.sqrt(np.var(grades['female'])/(len(grades['female']) - 1))
+
     male_average = sum(grades['male'])/len(grades['male'])
     male_std = np.sqrt(np.var(grades['male'])/(len(grades['male']) - 1))
+
     both_average = sum(grades['both'])/len(grades['both'])
     both_std = np.sqrt(np.var(grades['both'])/(len(grades['both']) - 1))
+
     unknown_average = sum(grades['unknown'])/len(grades['unknown'])
     unknown_std = np.sqrt(np.var(grades['unknown'])/(len(grades['unknown']) - 1))
     return [(female_average, female_std), (male_average, male_std),
