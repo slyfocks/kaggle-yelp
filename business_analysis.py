@@ -55,6 +55,5 @@ def predicted_business_rating():
         id_rating_dict[entry['business_id']] = predicted_rating
     return id_rating_dict
 
-print(predicted_business_rating())
 
 
