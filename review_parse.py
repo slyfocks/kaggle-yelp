@@ -11,7 +11,9 @@ def write_id_grades():
     with open('yelp_training_set_review.json') as file:
         outfile = csv.writer(open('grade_id_pairs.csv', 'w'))
         for review in file:
-            outfile.writerow([json.loads(review)['user_id'], str(grade_level(json.loads(review)['text']))])
+            outfile.writerow([json.loads(review)['user_id'],
+                              str(grade_level(json.loads(review)['text'])),
+                              json.loads(review)['stars']])
 
 
 def id_grades():
@@ -21,6 +23,15 @@ def id_grades():
         for entry in contents:
             id_grade_dict[entry[0]] = entry[1]
     return id_grade_dict
+
+
+def grade_stars():
+    with open('grade_id_pairs.csv') as file:
+        contents = csv.reader(file, delimiter=',')
+        grade_star_dict = {}
+        for entry in contents:
+            grade_star_dict[entry[1]] = entry[2]
+    return grade_star_dict
 
 
 def gender_grades():
@@ -48,5 +59,3 @@ def gender_average_grade():
     unknown_std = np.sqrt(np.var(grades['unknown'])/(len(grades['unknown']) - 1))
     return [(female_average, female_std), (male_average, male_std),
             (both_average, both_std), (unknown_average, unknown_std)]
-
-print(gender_average_grade())
