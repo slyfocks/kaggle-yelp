@@ -43,6 +43,29 @@ def name_gender(names):
     return name_genders
 
 
+#returns user_id:gender pairs in dict form
+def id_gender():
+    primary_guesser = NameGender("gender_guesser/us_census_1990_males", "gender_guesser/us_census_1990_females")
+    secondary_guesser = NameGender("gender_guesser/popular_1960_2010_males", "gender_guesser/popular_1960_2010_females")
+    id_gender = {}
+    i = 0
+    j = 0
+    for member in data:
+        name = member['name'].strip().lower()
+        gender = get_decision(primary_guesser, name)
+        if gender in ["male", "female", "both"]:
+            id_gender[member['user_id']] = gender
+            i += 1
+        else:
+            gender = get_decision(secondary_guesser, name)
+            if gender in ["male", "female", "both"]:
+                id_gender[member['user_id']] = gender
+            else:
+                id_gender[member['user_id']] = 'unknown'
+                j+=1
+    return id_gender
+
+
 def data_genders(data):
     # Give precedence to us_census data.
     primary_guesser = NameGender("gender_guesser/us_census_1990_males", "gender_guesser/us_census_1990_females")
@@ -131,4 +154,3 @@ def statistics(data):
 def training_mean(gender):
     #returns mean stars for each gender
     return statistics(data)[gender][1][0]
-
