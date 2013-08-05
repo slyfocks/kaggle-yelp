@@ -17,3 +17,9 @@ def fuc_scores():
         cool_score = cool_count/(funny_count + useful_count + cool_count + 1)
         fuc_dict[user['user_id']] = [funny_score, useful_score, cool_score]
     return fuc_dict
+
+
+def user_stars():
+    return {user['user_id']: user['average_stars'] for user in user_data}
+
+
