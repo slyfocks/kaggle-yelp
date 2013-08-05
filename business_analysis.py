@@ -1,12 +1,25 @@
 __author__ = 'slyfocks'
 import json
 import numpy as np
+import funny_useful_cool as fuc
 
 with open('yelp_training_set_business.json') as file:
     business_data = [json.loads(line) for line in file]
 
 with open('yelp_test_set_business.json') as file:
     test_business_data = [json.loads(line) for line in file]
+
+
+def review_counts():
+    return [entry['review_count'] for entry in business_data]
+
+
+def review_counts_dict():
+    return {entry['business_id']: entry['review_count'] for entry in test_business_data}
+
+
+def avg_review_counts():
+    return sum(review_counts())/len(review_counts())
 
 
 def categories(entry):
@@ -43,6 +56,7 @@ def average_category_rating():
 
 def predicted_business_rating():
     id_rating_dict = {}
+    mean = fuc.mean_user_stars()
     category_ratings = average_category_rating()
     for entry in business_data:
         actual_rating = entry['stars']
@@ -51,9 +65,9 @@ def predicted_business_rating():
         try:
             expected_rating = sum_expected_rating / num_categories
         except ZeroDivisionError:
-            expected_rating = actual_rating
+            expected_rating = (mean + actual_rating)/2
         review_count = entry['review_count']
-        predicted_rating = (actual_rating*review_count + expected_rating)/(review_count + 1)
+        predicted_rating = (actual_rating*np.log(review_count) + expected_rating)/(np.log(review_count) + 1)
         id_rating_dict[entry['business_id']] = predicted_rating
     for entry in test_business_data:
         try:
@@ -65,7 +79,7 @@ def predicted_business_rating():
             try:
                 expected_rating = sum_expected_rating / num_categories
             except ZeroDivisionError:
-                expected_rating = 3.7
+                expected_rating = mean
             predicted_rating = expected_rating
             id_rating_dict[entry['business_id']] = predicted_rating
     return id_rating_dict
