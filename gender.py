@@ -35,6 +35,11 @@ def id_reviews():
     return {member['user_id']: member['review_count'] for member in data}
 
 
+def avg_user_reviews():
+    values = id_reviews().values()
+    return sum(values)/len(values)
+
+
 def name_gender(names):
     primary_guesser = NameGender("gender_guesser/us_census_1990_males", "gender_guesser/us_census_1990_females")
     secondary_guesser = NameGender("gender_guesser/popular_1960_2010_males", "gender_guesser/popular_1960_2010_females")
