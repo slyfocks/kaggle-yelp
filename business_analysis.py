@@ -10,16 +10,34 @@ with open('yelp_test_set_business.json') as file:
     test_business_data = [json.loads(line) for line in file]
 
 
-def review_counts():
+def training_businesses():
+    return [entry['business_id'] for entry in business_data]
+
+
+def test_businesses():
+    return [entry['business_id'] for entry in test_business_data]
+
+
+def training_review_counts():
     return [entry['review_count'] for entry in business_data]
+
+
+def test_review_counts():
+    return [entry['review_count'] for entry in test_business_data]
 
 
 def review_counts_dict():
     return {entry['business_id']: entry['review_count'] for entry in test_business_data}
 
 
-def avg_review_counts():
-    return sum(review_counts())/len(review_counts())
+#output of this function is 20.19
+def avg_training_review_counts():
+    return sum(training_review_counts())/len(training_review_counts())
+
+
+#output of this function is 9.19. WAY DIFFERENT THAN TRAINING SET
+def avg_test_review_counts():
+    return sum(test_review_counts())/len(test_review_counts())
 
 
 def categories(entry):
