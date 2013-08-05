@@ -4,7 +4,9 @@ import numpy as np
 
 with open('yelp_training_set_business.json') as file:
     business_data = [json.loads(line) for line in file]
-print(business_data)
+
+with open('yelp_test_set_business.json') as file:
+    test_business_data = [json.loads(line) for line in file]
 
 
 def categories(entry):
@@ -53,6 +55,19 @@ def predicted_business_rating():
         review_count = entry['review_count']
         predicted_rating = (actual_rating*review_count + expected_rating)/(review_count + 1)
         id_rating_dict[entry['business_id']] = predicted_rating
+    for entry in test_business_data:
+        try:
+            predicted_rating = id_rating_dict[entry['business_id']]
+        except KeyError:
+            sum_expected_rating = sum([category_ratings[category] for category in categories(entry)
+                                       if category in category_set(business_data)])
+            num_categories = len(categories(entry))
+            try:
+                expected_rating = sum_expected_rating / num_categories
+            except ZeroDivisionError:
+                expected_rating = 3.7
+            predicted_rating = expected_rating
+            id_rating_dict[entry['business_id']] = predicted_rating
     return id_rating_dict
 
 
