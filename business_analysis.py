@@ -67,7 +67,7 @@ def predicted_business_rating():
         except ZeroDivisionError:
             expected_rating = (mean + actual_rating)/2
         review_count = entry['review_count']
-        predicted_rating = (actual_rating*np.log(review_count) + expected_rating)/(np.log(review_count) + 1)
+        predicted_rating = (actual_rating*review_count + expected_rating)/(review_count + 1)
         id_rating_dict[entry['business_id']] = predicted_rating
     for entry in test_business_data:
         try:
