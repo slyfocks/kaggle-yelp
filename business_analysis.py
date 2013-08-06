@@ -2,6 +2,7 @@ __author__ = 'slyfocks'
 import json
 import numpy as np
 import funny_useful_cool as fuc
+import csv
 
 with open('yelp_training_set_business.json') as file:
     training_business_data = [json.loads(line) for line in file]
@@ -57,6 +58,10 @@ def categories(entry):
     return entry['categories']
 
 
+def id_categories():
+    return {entry['business_id']: entry['categories'] for entry in training_business_data}
+
+
 def category_set(business_data):
     #puts the categories in each of the lists into one master list without repetition
     return set([category for entry in business_data for category in categories(entry)])
@@ -83,6 +88,51 @@ def average_category_rating():
             total_reviews += rating_pairs[1]
         average_rating_dict[category] = total_rating / total_reviews
     return average_rating_dict
+
+
+#returns a dictionary of business_ids with paired with a list of the grade levels of their reviews
+def id_grades():
+    with open('grade_id_pairs.csv') as file:
+        contents = csv.reader(file, delimiter=',')
+        id_grade_dict = {}
+        #initalize a dict entry to empty list for each user since some users have multiple reviews
+        for entry in contents:
+            #if it has values already, append another. otherwise, create the entry
+            try:
+                id_grade_dict[entry[3]].append(float(entry[1]))
+            except KeyError:
+                id_grade_dict[entry[3]] = [float(entry[1])]
+    return id_grade_dict
+
+
+#returns dict of business_ids and their average review grade level
+def id_grade_avg():
+    grade_dict = id_grades()
+    avg_grade_dict = {}
+    for business_id in list(grade_dict.keys()):
+        grade_list = grade_dict[business_id]
+        avg_grade_dict[business_id] = sum(grade_list)/len(grade_list)
+    return avg_grade_dict
+
+
+#is taking a really long time to run
+def grade_categories():
+    with open('grade_id_pairs.csv') as file:
+        contents = csv.reader(file, delimiter=',')
+        training_id_list = [entry[3] for entry in contents]
+    grade_dict = id_grades()
+    ids = training_businesses()
+    category_dict = id_categories()
+    category_grade_dict = {}
+    #get grades from ids
+    for business_id in training_id_list:
+        if business_id in ids:
+            for category in category_dict[business_id]:
+                try:
+                    category_grade_dict[category].append(grade_dict[business_id])
+                except KeyError:
+                    category_grade_dict[category] = grade_dict[business_id]
+    return category_grade_dict
 
 
 def predicted_business_rating():
