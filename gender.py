@@ -4,9 +4,12 @@ import numpy as np
 from gender_guesser.name_gender import NameGender
 from pandas import *
 import matplotlib.pyplot as plt
-import pylab
 with open('yelp_training_set_user.json') as file:
     data = [json.loads(line) for line in file]
+
+with open('yelp_test_set_user.json') as file:
+    test_data = [json.loads(line) for line in file]
+
 stars_reviews = [{'average_stars': member['average_stars'], 'review_count': member['review_count']} for member in data]
 #str.lower is used so lowercase names appear in the right order alongside uppercase names
 sorted_stars_reviews = sorted(stars_reviews, key=lambda x: x.keys())
@@ -62,9 +65,26 @@ def id_gender():
     primary_guesser = NameGender("gender_guesser/us_census_1990_males", "gender_guesser/us_census_1990_females")
     secondary_guesser = NameGender("gender_guesser/popular_1960_2010_males", "gender_guesser/popular_1960_2010_females")
     id_gender = {}
-    i = 0
-    j = 0
     for member in data:
+        name = member['name'].strip().lower()
+        gender = get_decision(primary_guesser, name)
+        if gender in ["male", "female", "both"]:
+            id_gender[member['user_id']] = gender
+        else:
+            gender = get_decision(secondary_guesser, name)
+            if gender in ["male", "female", "both"]:
+                id_gender[member['user_id']] = gender
+            else:
+                id_gender[member['user_id']] = 'unknown'
+    return id_gender
+
+
+#uses test data, similar to above function because I don't feel like breaking everything
+def test_id_gender():
+    primary_guesser = NameGender("gender_guesser/us_census_1990_males", "gender_guesser/us_census_1990_females")
+    secondary_guesser = NameGender("gender_guesser/popular_1960_2010_males", "gender_guesser/popular_1960_2010_females")
+    id_gender = {}
+    for member in test_data:
         name = member['name'].strip().lower()
         gender = get_decision(primary_guesser, name)
         if gender in ["male", "female", "both"]:
