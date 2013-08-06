@@ -37,3 +37,18 @@ def review_training_test_users():
     training_review_id_list = rp.training_review_ids()
     return [user_id for user_id in training_review_id_list if user_id in test_review_users]
 
+
+#takes in user_ids, outputs dict of user_ids and predicted mean
+def user_review_parse_rating():
+    user_grades = rp.id_grade_avg()
+    partitions = rp.partitions()
+    #this is a dict, give it a partition number
+    partition_mean_stds = rp.partition_mean_std()
+    user_rating_dict = {}
+    for user_id in review_training_test_users():
+        grade = user_grades[user_id]
+        for i in range(len(partitions)):
+            if grade < float(partitions[i][0]):
+                user_rating_dict[user_id] = partition_mean_stds[partitions[i]]
+                break
+    return user_rating_dict
