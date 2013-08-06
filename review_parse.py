@@ -6,7 +6,6 @@ import csv
 import gender
 import matplotlib.pyplot as plt
 from grade_level import grade_level
-from mpl_toolkits.mplot3d import Axes3D
 
 
 #this takes a LONG time to run...only run this once to make the csv file, then read off of that.
