@@ -102,22 +102,41 @@ def grade_partitioned_dict():
     #list of numbers that partition the grade list into equal parts
     partition_list = []
     grade_star_dict = {}
+    grade_grade_dict = {}
     for i in range(4907, len(sorted_grade_list), 5000):
         partition_list.append(sorted_grade_list[i])
         grade_star_dict[str(sorted_grade_list[i])] = []
+        grade_grade_dict[str(sorted_grade_list[i])] = []
     for i in range(len(grades)):
         for partition in partition_list:
             if grades[i] < partition:
                 grade_star_dict[str(partition)].append(stars[i])
+                grade_grade_dict[str(partition)].append(grades[i])
                 #we only want stars[i] to be included the first time grades[i] is less than a partition
                 break
-    return grade_star_dict
+    return grade_star_dict, grade_grade_dict
+
+
+#creates scatter plot for partition for any num in range(4907, 229907, 5000)
+def scatter_partition(num):
+    gpd = grade_partitioned_dict()
+    x = np.array(gpd[0][str(sort_grades(1000)[num])])
+    y = np.array(gpd[1][str(sort_grades(1000)[num])])
+    plt.scatter(x, y)
+    plt.show()
+    return
+
+
+#sorted partition list, input to grade partitioned dict to get value
+def partitions():
+    grade_dict = grade_partitioned_dict()[0]
+    return np.sort(list(grade_dict.keys()))
 
 
 def partition_mean_std():
     grade_dict = grade_partitioned_dict()
-    return [(np.mean(grade_dict[partition]), np.std(grade_dict[partition]))
-            for partition in list(grade_dict.keys())]
+    return {partition: (np.mean(grade_dict[0][partition]), np.std(grade_dict[0][partition]))
+            for partition in list(grade_dict[0].keys())}
 
 
 def grades_stars_avg():
@@ -173,13 +192,9 @@ def gender_average_grade():
     return [(female_average, female_std), (male_average, male_std),
             (both_average, both_std), (unknown_average, unknown_std)]
 
-'''
-print(np.mean(grade_range_star_dict()['-20']), np.var(grade_range_star_dict()['-20']))
-print(np.mean(grade_range_star_dict()['-4']), np.var(grade_range_star_dict()['-4']))
-print(np.mean(grade_range_star_dict()['0']), np.var(grade_range_star_dict()['0']))
-print(np.mean(grade_range_star_dict()['3']), np.var(grade_range_star_dict()['3']))
-print(np.mean(grade_range_star_dict()['5']), np.var(grade_range_star_dict()['5']))
-print(np.mean(grade_range_star_dict()['8']), np.var(grade_range_star_dict()['8']))
-print(np.mean(grade_range_star_dict()['13']), np.var(grade_range_star_dict()['13']))
-print(np.mean(grade_range_star_dict()['23']), np.var(grade_range_star_dict()['23']))
-'''
+
+#important: predictor function**
+def review_prediction():
+    id_grade_dict = id_grade_avg()
+
+    return
