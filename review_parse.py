@@ -87,35 +87,37 @@ def grades_stars():
     return [grades, stars]
 
 
-def sort_grades():
+#maximal length = 229907
+def sort_grades(num):
     grade_star_lists = grades_stars()
-    return list(np.sort(grade_star_lists[0]))
+    return [grade for grade in list(np.sort(grade_star_lists[0])) if grade < num]
 
 
-#partition the grade domain into areas so properties of each range can be analyzed
-def grade_range_star_dict():
-    grades_stars_list = grades_stars()
-    grades = grades_stars_list[0]
-    stars = grades_stars_list[1]
-    grade_star_dict = {'-20': [], '-4': [], '0': [], '3': [], '5': [], '8': [], '13': [], '23': []}
-    for i in range(len(grades_stars_list[0])):
-        if -20 < grades[i] < -4:
-            grade_star_dict['-20'].append(stars[i])
-        elif -4 < grades[i] < 0:
-            grade_star_dict['-4'].append(stars[i])
-        elif 0 < grades[i] < 3:
-            grade_star_dict['0'].append(stars[i])
-        elif 3 < grades[i] < 5:
-            grade_star_dict['3'].append(stars[i])
-        elif 5 < grades[i] < 8:
-            grade_star_dict['5'].append(stars[i])
-        elif 8 < grades[i] < 13:
-            grade_star_dict['8'].append(stars[i])
-        elif 13 < grades[i] < 23:
-            grade_star_dict['13'].append(stars[i])
-        else:
-            grade_star_dict['23'].append(stars[i])
+def grade_partitioned_dict():
+    #high number so all the grades are included
+    sorted_grade_list = sort_grades(1000)
+    grade_star_list = grades_stars()
+    grades = grade_star_list[0]
+    stars = grade_star_list[1]
+    #list of numbers that partition the grade list into equal parts
+    partition_list = []
+    grade_star_dict = {}
+    for i in range(4907, len(sorted_grade_list), 5000):
+        partition_list.append(sorted_grade_list[i])
+        grade_star_dict[str(sorted_grade_list[i])] = []
+    for i in range(len(grades)):
+        for partition in partition_list:
+            if grades[i] < partition:
+                grade_star_dict[str(partition)].append(stars[i])
+                #we only want stars[i] to be included the first time grades[i] is less than a partition
+                break
     return grade_star_dict
+
+
+def partition_mean_std():
+    grade_dict = grade_partitioned_dict()
+    return [(np.mean(grade_dict[partition]), np.std(grade_dict[partition]))
+            for partition in list(grade_dict.keys())]
 
 
 def grades_stars_avg():
@@ -171,12 +173,13 @@ def gender_average_grade():
     return [(female_average, female_std), (male_average, male_std),
             (both_average, both_std), (unknown_average, unknown_std)]
 
-
-def grade_star_regression():
-    x = np.array(grades_stars()[0][:40000])
-    y = np.array(grades_stars()[1][:40000])
-    A = np.vstack([x, np.ones(len(x))]).T
-    m, c = np.linalg.lstsq(A, y)[0]
-    plt.scatter(x,y)
-    return m,c
-print(grade_star_regression())
+'''
+print(np.mean(grade_range_star_dict()['-20']), np.var(grade_range_star_dict()['-20']))
+print(np.mean(grade_range_star_dict()['-4']), np.var(grade_range_star_dict()['-4']))
+print(np.mean(grade_range_star_dict()['0']), np.var(grade_range_star_dict()['0']))
+print(np.mean(grade_range_star_dict()['3']), np.var(grade_range_star_dict()['3']))
+print(np.mean(grade_range_star_dict()['5']), np.var(grade_range_star_dict()['5']))
+print(np.mean(grade_range_star_dict()['8']), np.var(grade_range_star_dict()['8']))
+print(np.mean(grade_range_star_dict()['13']), np.var(grade_range_star_dict()['13']))
+print(np.mean(grade_range_star_dict()['23']), np.var(grade_range_star_dict()['23']))
+'''
