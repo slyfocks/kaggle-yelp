@@ -191,10 +191,3 @@ def gender_average_grade():
     unknown_std = np.sqrt(np.var(grades['unknown'])/(len(grades['unknown']) - 1))
     return [(female_average, female_std), (male_average, male_std),
             (both_average, both_std), (unknown_average, unknown_std)]
-
-
-#important: predictor function**
-def review_prediction():
-    id_grade_dict = id_grade_avg()
-
-    return
