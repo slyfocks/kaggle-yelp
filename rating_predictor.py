@@ -166,8 +166,10 @@ def main():
     #business stuff
     test_businesses = banal.review_test_businesses()
     training_businesses = banal.review_training_businesses()
+    training_review_businesses = list(banal.id_stars.keys())
     test_categories = [banal.categories(entry) for entry in test_businesses]
     training_categories = [banal.categories(entry) for entry in training_businesses]
+    expected_business_rating = banal.predicted_business_rating()
 
     #funny_useful_cool stuff
     fuc_rating_dict = fuc.predicted_rating()
@@ -242,12 +244,17 @@ def main():
 
 
     #business stuff, fill this
-    for business in training_businesses:
-        business_stars = id_stars_dict[business]
-        review_count = id_reviews[user]
-        rating = (np.log(review_count)*user_stars + user_gender_rating)/(np.log(review_count) + 1)
+    for business in training_review_businesses:
+        rating = mean_stars
         business_ratings[business] = rating
-    for user in test_businesses:
+    for business in training_businesses:
+        '''business_stars = id_stars_dict[business]
+        review_count = id_reviews[user]
+        rating = (np.log(review_count)*business_stars + user_gender_rating)/(np.log(review_count) + 1)
+        business_ratings[business] = rating'''
+        rating = expected_business_rating
+        business_ratings[business] = rating
+    '''for business in test_businesses:
         user_gender_rating = gender_ratings[user]
         rating = user_gender_rating
         user_ratings[user] = rating
@@ -274,12 +281,18 @@ def main():
         fuc_rating = fuc_rating_dict[user]
         user_stars = id_stars_dict[user]
         review_count = id_reviews[user]
-        #rating =
-    keys = ['RecommendationId', 'Stars']
-    f = open('businesspeoplemod.csv', 'w')
-    dict_writer = csv.DictWriter(f, keys)
-    dict_writer.writer.writerow(keys)
-    dict_writer.writerows(gender_ratings)
+        #rating ='''
+    with open('yelp_test_set_review.json') as file:
+        data = [json.loads(entry) for entry in file]
+        ratings = []
+        for i in range(len(data)):
+            rating = (user_ratings[data[i]['user_id']] + business_ratings[data[i]['business_id']])/2
+            ratings.append({'RecommendationId': i+1, 'Stars': rating})
+        keys = ['RecommendationId', 'Stars']
+        f = open('complex.csv', 'w')
+        dict_writer = csv.DictWriter(f, keys)
+        dict_writer.writer.writerow(keys)
+        dict_writer.writerows(ratings)
 
 if __name__ == '__main__':
     main()
