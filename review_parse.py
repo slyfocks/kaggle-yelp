@@ -129,7 +129,7 @@ def scatter_partition(num):
 #sorted partition list, input to grade partitioned dict to get value
 def partitions():
     grade_dict = grade_partitioned_dict()[0]
-    return np.sort(list(grade_dict.keys()))
+    return list(np.sort(list(grade_dict.keys())))
 
 
 def partition_mean_std():
