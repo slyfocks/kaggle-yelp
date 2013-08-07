@@ -17,9 +17,12 @@ def fuc_scores():
         funny_count = user['votes']['funny']
         useful_count = user['votes']['useful']
         cool_count = user['votes']['cool']
-        funny_score = funny_count/(funny_count + useful_count + cool_count + 1)
-        useful_score = useful_count/(funny_count + useful_count + cool_count + 1)
-        cool_score = cool_count/(funny_count + useful_count + cool_count + 1)
+        if funny_count + useful_count + cool_count == 0:
+            funny_score, useful_score, cool_score = 0, 0, 0
+        else:
+            funny_score = funny_count/(funny_count + useful_count + cool_count)
+            useful_score = useful_count/(funny_count + useful_count + cool_count)
+            cool_score = cool_count/(funny_count + useful_count + cool_count)
         fuc_dict[user['user_id']] = [funny_score, useful_score, cool_score]
     return fuc_dict
 
@@ -88,16 +91,20 @@ def predicted_rating():
     ids = user_ids()
     fuc_dict = fuc_scores()
     rating_dict = {}
+    mean = mean_user_stars()
     mf, cf = fuc_regression('funny')
     mu, cu = fuc_regression('useful')
     mc, cc = fuc_regression('cool')
     for id in ids:
-        #prediction based on funny slope and intercept and funny score
-        funny_stars = fuc_dict[id][0]*mf + cf
-        #prediction based on useful slope and intercept and useful score
-        useful_stars = fuc_dict[id][1]*mu + cu
-        #prediction based on cool slope and intercept and cool score
-        cool_stars = fuc_dict[id][2]*mc + cc
-        predicted_stars = (funny_stars + useful_stars + cool_stars)/3
-        rating_dict[id] = predicted_stars
+        if fuc_dict[id][0] + fuc_dict[id][1] + fuc_dict[id][2] == 0:
+            rating_dict[id] = mean
+        else:
+            #prediction based on funny slope and intercept and funny score
+            funny_stars = fuc_dict[id][0]*mf + cf
+            #prediction based on useful slope and intercept and useful score
+            useful_stars = fuc_dict[id][1]*mu + cu
+            #prediction based on cool slope and intercept and cool score
+            cool_stars = fuc_dict[id][2]*mc + cc
+            predicted_stars = fuc_dict[id][0]*funny_stars + fuc_dict[id][1]*useful_stars + fuc_dict[id][2]*cool_stars
+            rating_dict[id] = predicted_stars
     return rating_dict
