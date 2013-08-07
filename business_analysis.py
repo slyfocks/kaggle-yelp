@@ -3,6 +3,8 @@ import json
 import numpy as np
 import funny_useful_cool as fuc
 import csv
+import review_parse as rp
+from collections import OrderedDict
 
 with open('yelp_training_set_business.json') as file:
     training_business_data = [json.loads(line) for line in file]
@@ -105,7 +107,7 @@ def id_grades():
     return id_grade_dict
 
 
-#returns dict of business_ids and their average review grade level
+#returns dict of business_ids and their average review grade level; only for businesses in training_review set
 def id_grade_avg():
     grade_dict = id_grades()
     avg_grade_dict = {}
@@ -115,24 +117,79 @@ def id_grade_avg():
     return avg_grade_dict
 
 
-#is taking a really long time to run
+def id_stars():
+    bus_id_star_dict = {}
+    with open('grade_id_pairs.csv') as file:
+        contents = csv.reader(file, delimiter=',')
+        for entry in contents:
+            try:
+                bus_id_star_dict[entry[3]].append(float(entry[2]))
+            except KeyError:
+                bus_id_star_dict[entry[3]] = [float(entry[2])]
+    return bus_id_star_dict
+
+
+def id_star_avg():
+    star_dict = id_stars()
+    avg_star_dict = {}
+    for business_id in list(star_dict.keys()):
+        star_list = star_dict[business_id]
+        avg_star_dict[business_id] = sum(star_list)/len(star_list)
+    return avg_star_dict
+
+
+#is the star rating affected by the difference between customer and business average writing grade?
+#perhaps when the two are very similar the rating is good and when they diverge it gets worse?
+def stars_grade_diff():
+    business_id_star_dict = id_star_avg()
+    user_id_grade_dict = rp.id_grade_avg()
+    business_id_grade_dict = id_grade_avg()
+    value_dict = {}
+    with open('grade_id_pairs.csv') as file:
+        contents = csv.reader(file, delimiter=',')
+        for entry in contents:
+            try:
+                #entry[2] is star rating for that particular review
+                value_dict[entry[3]].append((business_id_star_dict[entry[3]] - float(entry[2]),
+                                             user_id_grade_dict[entry[0]] - float(entry[1]),
+                                             business_id_grade_dict[entry[3]] - float(entry[1]),
+                                             user_id_grade_dict[entry[0]] - business_id_grade_dict[entry[3]]))
+            except KeyError:
+                value_dict[entry[3]] = [(business_id_star_dict[entry[3]] - float(entry[2]),
+                                        user_id_grade_dict[entry[0]] - float(entry[1]),
+                                        business_id_grade_dict[entry[3]] - float(entry[1]),
+                                        user_id_grade_dict[entry[0]] - business_id_grade_dict[entry[3]])]
+    return value_dict
+
+
 def grade_categories():
     with open('grade_id_pairs.csv') as file:
         contents = csv.reader(file, delimiter=',')
-        training_id_list = [entry[3] for entry in contents]
-    grade_dict = id_grades()
-    ids = training_businesses()
-    category_dict = id_categories()
-    category_grade_dict = {}
-    #get grades from ids
-    for business_id in training_id_list:
-        if business_id in ids:
-            for category in category_dict[business_id]:
-                try:
-                    category_grade_dict[category].append(grade_dict[business_id])
-                except KeyError:
-                    category_grade_dict[category] = grade_dict[business_id]
+        category_grade_dict = {}
+        category_dict = id_categories()
+        for entry in contents:
+            business_id = entry[3]
+            grade = entry[1]
+            #get grades from ids
+            try:
+                for category in category_dict[business_id]:
+                    try:
+                        category_grade_dict[category].append(float(grade))
+                    except KeyError:
+                        category_grade_dict[category] = [float(grade)]
+            except KeyError:
+                break
     return category_grade_dict
+
+
+#categories paired with their average grade level review
+def grade_categories_avg():
+    categories_grade_dict = grade_categories()
+    categories = list(categories_grade_dict.keys())
+    avg_dict = {}
+    for category in categories:
+        avg_dict[category] = sum(categories_grade_dict[category])/len(categories_grade_dict[category])
+    return avg_dict
 
 
 def predicted_business_rating():
