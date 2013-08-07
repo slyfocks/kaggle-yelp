@@ -165,7 +165,7 @@ def main():
     #business stuff
     test_businesses = banal.review_test_businesses()
     training_businesses = banal.review_training_businesses()
-    training_review_businesses = list(banal.id_stars.keys())
+    training_review_businesses = list(banal.id_stars().keys())
     test_categories = [banal.categories(entry) for entry in test_businesses]
     training_categories = [banal.categories(entry) for entry in training_businesses]
     expected_business_rating = banal.predicted_business_rating()
@@ -288,10 +288,10 @@ def main():
             rating = (user_ratings[datas[i]['user_id']] + business_ratings[datas[i]['business_id']])/2
             ratings.append({'RecommendationId': i+1, 'Stars': rating})
         keys = ['RecommendationId', 'Stars']
-        f = open('complex.csv', 'w')
-        dict_writer = csv.DictWriter(f, keys)
-        dict_writer.writer.writerow(keys)
-        dict_writer.writerows(ratings)
+    f = open('complex.csv', 'w')
+    dict_writer = csv.DictWriter(f, keys)
+    dict_writer.writer.writerow(keys)
+    dict_writer.writerows(ratings)
 
 if __name__ == '__main__':
     main()
