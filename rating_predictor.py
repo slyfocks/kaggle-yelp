@@ -283,10 +283,10 @@ def main():
         review_count = id_reviews[user]
         #rating ='''
     with open('yelp_test_set_review.json') as file:
-        data = [json.loads(entry) for entry in file]
+        datas = [json.loads(entry) for entry in file]
         ratings = []
-        for i in range(len(data)):
-            rating = (user_ratings[data[i]['user_id']] + business_ratings[data[i]['business_id']])/2
+        for i in range(len(datas)):
+            rating = (user_ratings[datas[i]['user_id']] + business_ratings[datas[i]['business_id']])/2
             ratings.append({'RecommendationId': i+1, 'Stars': rating})
         keys = ['RecommendationId', 'Stars']
         f = open('complex.csv', 'w')
