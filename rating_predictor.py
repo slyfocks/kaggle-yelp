@@ -143,8 +143,8 @@ def mess():
 
 def main():
     #user_ids is test set_review_ids
-    name_list = names(user_ids)
     gender_ratings = gender.id_gender()
+    test_gender_ratings = gender.test_id_gender()
     mean_stars = fuc.mean_user_stars()
 
     #for users in training user set
@@ -155,6 +155,8 @@ def main():
     test_users = ua.review_test_users()
     training_users = ua.review_training_users()
     all_groups = ua.all_group_users()
+
+    print('hryUDaRk7FLuDAYui2oldw' in training_users)
 
     #these variables will be for users who have writing samples available
     parse_review_users = ua.review_training_test_users()
@@ -183,14 +185,14 @@ def main():
         user_ratings[user] = mean_stars
 
     for user in training_users:
-        user_gender_rating = gender_ratings[user]
+        user_gender_rating = gender.training_mean(gender_ratings[user])
         user_stars = id_stars_dict[user]
         review_count = id_reviews[user]
         rating = (np.log(review_count)*user_stars + user_gender_rating)/(np.log(review_count) + 1)
         user_ratings[user] = rating
 
     for user in test_users:
-        user_gender_rating = gender_ratings[user]
+        user_gender_rating = gender.training_mean(test_gender_ratings[user])
         rating = user_gender_rating
         user_ratings[user] = rating
 
@@ -202,14 +204,14 @@ def main():
         user_ratings[user] = rating
 
     for user in (test_users and training_users):
-        user_gender_rating = gender_ratings[user]
+        user_gender_rating = gender.training_mean(gender_ratings[user])
         user_stars = id_stars_dict[user]
         review_count = id_reviews[user]
         rating = (np.log(review_count)*user_stars + user_gender_rating)/(np.log(review_count) + 1)
         user_ratings[user] = rating
 
     for user in (parse_review_users and training_users):
-        user_gender_rating = gender_ratings[user]
+        user_gender_rating = gender.training_mean(gender_ratings[user])
         user_review_rating = parse_ratings[user]
         user_stars = id_stars_dict[user]
         user_stars_review = stars_average[user]
@@ -221,7 +223,7 @@ def main():
         user_ratings[user] = rating
 
     for user in (parse_review_users and test_users):
-        user_gender_rating = gender_ratings[user]
+        user_gender_rating = gender.training_mean(test_gender_ratings[user])
         user_review_rating = parse_ratings[user]
         user_stars = id_stars_dict[user]
         review_count_reviews = len(review_user_stars[user])
@@ -230,7 +232,7 @@ def main():
         user_ratings[user] = rating
 
     for user in all_groups:
-        user_gender_rating = gender_ratings[user]
+        user_gender_rating = gender.training_mean(gender_ratings[user])
         user_review_rating = parse_ratings[user]
         user_stars = id_stars_dict[user]
         user_stars_review = stars_average[user]
