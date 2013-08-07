@@ -165,7 +165,7 @@ def main():
 
     #business stuff
     test_businesses = banal.review_test_businesses()
-    training_businesses = banal.review_test_businesses()
+    training_businesses = banal.review_training_businesses()
     test_categories = [banal.categories(entry) for entry in test_businesses]
     training_categories = [banal.categories(entry) for entry in training_businesses]
 
@@ -177,7 +177,6 @@ def main():
     #where final ratings go for businesses
     business_ratings = {}
 
-
     #in case all of these loops don't contain certain users, initialize all users to the mean
     for user in user_ids:
         user_ratings[user] = mean_stars
@@ -188,34 +187,59 @@ def main():
         review_count = id_reviews[user]
         rating = (np.log(review_count)*user_stars + user_gender_rating)/(np.log(review_count) + 1)
         user_ratings[user] = rating
+
     for user in test_users:
         user_gender_rating = gender_ratings[user]
         rating = user_gender_rating
         user_ratings[user] = rating
+
     for user in parse_review_users:
         user_review_rating = parse_ratings[user]
         user_stars = stars_average[user]
         review_count = len(review_user_stars[user])
-        rating = user_review_rating
+        rating = user_review_rating + user_stars*np.log(review_count)
+        user_ratings[user] = rating
+
     for user in (test_users and training_users):
         user_gender_rating = gender_ratings[user]
         user_stars = id_stars_dict[user]
         review_count = id_reviews[user]
         rating = (np.log(review_count)*user_stars + user_gender_rating)/(np.log(review_count) + 1)
         user_ratings[user] = rating
+
     for user in (parse_review_users and training_users):
-        #rating =
-    for user in (parse_review_users and test_users):
-        review_count = test_count
         user_gender_rating = gender_ratings[user]
-        #rating =
+        user_review_rating = parse_ratings[user]
+        user_stars = id_stars_dict[user]
+        user_stars_review = stars_average[user]
+        review_count = id_reviews[user]
+        review_count_reviews = len(review_user_stars[user])
+        rating = ((np.log(review_count_reviews)*user_review_rating + user_stars*np.log(review_count)
+                  + user_stars_review*np.log(review_count_reviews) + user_gender_rating)/(2*np.log(review_count_reviews)
+                                                                                          + np.log(review_count)) + 1)
+        user_ratings[user] = rating
+
+    for user in (parse_review_users and test_users):
+        user_gender_rating = gender_ratings[user]
+        user_review_rating = parse_ratings[user]
+        user_stars = id_stars_dict[user]
+        review_count_reviews = len(review_user_stars[user])
+        rating = (user_gender_rating + user_review_rating*np.log(review_count_reviews))/(np.log(review_count_reviews)
+                                                                                         + 1)
+        user_ratings[user] = rating
+
     for user in all_groups:
         user_gender_rating = gender_ratings[user]
         user_review_rating = parse_ratings[user]
-        fuc_rating = fuc_rating_dict[user]
         user_stars = id_stars_dict[user]
+        user_stars_review = stars_average[user]
         review_count = id_reviews[user]
-        #rating =
+        review_count_reviews = len(review_user_stars[user])
+        rating = ((np.log(review_count_reviews)*user_review_rating + user_stars*np.log(review_count)
+                  + user_stars_review*np.log(review_count_reviews) + user_gender_rating)/(2*np.log(review_count_reviews)
+                                                                                          + np.log(review_count)) + 1)
+        user_ratings[user] = rating
+
 
     #business stuff, fill this
     for business in training_businesses:
@@ -224,11 +248,11 @@ def main():
         review_count = id_reviews[user]
         rating = (np.log(review_count)*user_stars + user_gender_rating)/(np.log(review_count) + 1)
         business_ratings[business] = rating
-    for user in test_users:
+    for user in test_businesses:
         user_gender_rating = gender_ratings[user]
         rating = user_gender_rating
         user_ratings[user] = rating
-    for user in parse_review_users:
+    for user in parse_review_businesses:
         user_review_rating = parse_ratings[user]
         user_stars = stars_average[user]
         review_count = len(review_user_stars[user])
