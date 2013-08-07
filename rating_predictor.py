@@ -145,7 +145,6 @@ def main():
     #user_ids is test set_review_ids
     name_list = names(user_ids)
     gender_ratings = gender_means_recommendation(genders(name_list))
-    test_count = data['review_count']
     mean_stars = fuc.mean_user_stars()
 
     #for users in training user set
