@@ -7,6 +7,8 @@ import gender
 import review_parse
 import business_analysis as banal
 import funny_useful_cool as fuc
+import user_analysis as ua
+
 #right now the code is agnostic to business data. coming shortly...
 with open('yelp_test_set_user.json') as file:
     data = [json.loads(line) for line in file]
@@ -90,7 +92,7 @@ def test_id_reviews():
     return {member['user_id']: member['review_count'] for member in data}
 
 
-def main():
+def mess():
     mean_stars = fuc.mean_user_stars()
     name_list = names(user_ids)
     business_ratings = banal.predicted_business_rating()
@@ -138,5 +140,20 @@ def main():
     dict_writer.writer.writerow(keys)
     dict_writer.writerows(gender_ratings)
 
+
+def main():
+    name_list = names(user_ids)
+    gender_ratings = gender_means_recommendation(genders(name_list))
+    #this variable will be for users who have writing samples available
+    parse_review_users = ua.review_training_test_users()
+    parse_ratings = ua.user_review_parse_rating()
+    for i in range(len(user_ids)):
+        if user_ids[i] in parse_review_users:
+            parse_ratings[user_ids[i]]
+    keys = ['RecommendationId', 'Stars']
+    f = open('businesspeoplemod.csv', 'w')
+    dict_writer = csv.DictWriter(f, keys)
+    dict_writer.writer.writerow(keys)
+    dict_writer.writerows(gender_ratings)
 if __name__ == '__main__':
     main()
