@@ -23,5 +23,3 @@ def training_checkin_business_ids():
 #displays the business_ids that are in the training set and final review set
 def review_training_businesses():
     return [rating for rating in banal.test_businesses() if rating in review_businesses]
-
-print(len(review_training_businesses()))
