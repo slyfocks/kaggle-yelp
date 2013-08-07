@@ -264,11 +264,12 @@ def predicted_business_rating():
         actual_rating = entry['stars']
         sum_expected_rating = sum([category_ratings[category] for category in categories(entry)])
         num_categories = len(categories(entry))
+        review_count = entry['review_count']
         try:
             expected_rating = sum_expected_rating / num_categories
         except ZeroDivisionError:
-            expected_rating = (mean + actual_rating)/2
-        review_count = entry['review_count']
+            #gives more weight to their average rating if more reviews
+            expected_rating = (mean + review_count*actual_rating)/(1 + review_count)
         predicted_rating = (actual_rating*review_count + expected_rating)/(review_count + 1)
         id_rating_dict[entry['business_id']] = predicted_rating
     for entry in test_business_data:
