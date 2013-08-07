@@ -146,7 +146,7 @@ def main():
     name_list = names(user_ids)
     gender_ratings = gender_means_recommendation(genders(name_list))
     test_count = data['review_count']
-    mean_stars = fuc.mean_user_stars()[user]
+    mean_stars = fuc.mean_user_stars()
 
     #for users in training user set
     id_stars_dict = gender.id_stars()
@@ -243,7 +243,6 @@ def main():
 
     #business stuff, fill this
     for business in training_businesses:
-        business_gender_rating = gender_ratings[business]
         business_stars = id_stars_dict[business]
         review_count = id_reviews[user]
         rating = (np.log(review_count)*user_stars + user_gender_rating)/(np.log(review_count) + 1)
