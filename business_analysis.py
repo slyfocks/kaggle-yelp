@@ -150,7 +150,7 @@ def stars_grade_diff():
         for entry in contents:
             try:
                 #entry[2] is star rating for that particular review
-                value_dict[entry[3]].append((business_id_star_dict[entry[3]] - float(entry[2]),
+                value_dict[entry[3]].append((float(entry[2]) - business_id_star_dict[entry[3]],
                                              user_id_grade_dict[entry[0]] - float(entry[1]),
                                              business_id_grade_dict[entry[3]] - float(entry[1]),
                                              user_id_grade_dict[entry[0]] - business_id_grade_dict[entry[3]]))
