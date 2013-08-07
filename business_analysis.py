@@ -4,6 +4,7 @@ import numpy as np
 import funny_useful_cool as fuc
 import csv
 import review_parse as rp
+import matplotlib.pyplot as plt
 from collections import OrderedDict
 
 with open('yelp_training_set_business.json') as file:
@@ -51,7 +52,7 @@ def review_training_businesses():
     return [id for id in training_businesses() if id in review_businesses]
 
 
-#displays the business_ids that are in the training set and final review set: len = 1205
+#displays the business_ids that are in the test set and final review set: len = 1205
 def review_test_businesses():
     return [id for id in test_businesses() if id in review_businesses]
 
@@ -138,8 +139,7 @@ def id_star_avg():
     return avg_star_dict
 
 
-#is the star rating affected by the difference between customer and business average writing grade?
-#perhaps when the two are very similar the rating is good and when they diverge it gets worse?
+#build up dict of business_ids and grade and star differences between business and user averages
 def stars_grade_diff():
     business_id_star_dict = id_star_avg()
     user_id_grade_dict = rp.id_grade_avg()
@@ -155,11 +155,75 @@ def stars_grade_diff():
                                              business_id_grade_dict[entry[3]] - float(entry[1]),
                                              user_id_grade_dict[entry[0]] - business_id_grade_dict[entry[3]]))
             except KeyError:
-                value_dict[entry[3]] = [(business_id_star_dict[entry[3]] - float(entry[2]),
+                value_dict[entry[3]] = [(float(entry[2]) - business_id_star_dict[entry[3]],
                                         user_id_grade_dict[entry[0]] - float(entry[1]),
                                         business_id_grade_dict[entry[3]] - float(entry[1]),
                                         user_id_grade_dict[entry[0]] - business_id_grade_dict[entry[3]])]
     return value_dict
+
+
+#makes lists for each difference that are easier to work with for correlations
+#IMPORTANT FUNCTION, LOTS OF INFO
+def grade_diffs():
+    #unpack the values list
+    stars_grades = [value for values in stars_grade_diff().values() for value in values]
+    star_diff, user_grade_diff, business_grade_diff, user_business_diff = zip(*stars_grades)
+    return [list(star_diff), list(user_grade_diff), list(business_grade_diff), list(user_business_diff)]
+
+
+def diff_pair():
+    diffs = grade_diffs()
+    return [diffs[0], diffs[3]]
+
+
+#trying to predict deviation from star average, so sort stars by grade index
+def sort_diffs():
+    star_diff = diff_pair()[0]
+    grades_diff = diff_pair()[1]
+    sorted_stars = [x for (y, x) in sorted(zip(grades_diff, star_diff))]
+    return sorted_stars
+
+
+#creates partitions of 5000 based on writing grade difference and star rating difference
+def group_diffs():
+    #stars sorted by corresponding grades
+    sorted_stars = sort_diffs()
+    sorted_grades = sorted(diff_pair()[1])
+    grade_star_dict = {str(sorted_grades[4907]): sorted_stars[:4907]}
+    for i in range(9907, len(sorted_stars), 5000):
+        grade_star_dict[str(sorted_grades[i])] = sorted_stars[i-5000:i]
+    return grade_star_dict
+
+
+def partitions():
+    return np.sort(list(group_diffs().keys()))
+
+
+def partition_mean_std():
+    partition_list = partitions()
+    diff_dict = group_diffs()
+    return {partition: (np.mean(diff_dict[partition]), np.std(diff_dict[partition]))
+            for partition in partition_list}
+
+
+#is the star rating affected by the difference between customer and business average writing grade?
+#perhaps when the two are very similar the rating is good and when they diverge it gets worse?
+#p = -0.0518x^2 + 0.1276x + 0.06336, which reaches max at about x = 1.1
+#HYPOTHESIS TRUE
+def diff_plots():
+    diff_lists = grade_diffs()
+    x = np.array(diff_lists[0])
+    y = np.array(diff_lists[3])
+    z = np.polyfit(x, y, 2)
+    p = np.poly1d(z)
+    xp = np.linspace(-5, 5, 100)
+    plt.scatter(x, y)
+    plt.xlim(-5, 5)
+    plt.plot(xp, p(xp), '-')
+    plt.ylabel('User writing level minus average business reviewer writing level')
+    plt.xlabel('Grade given for the business minus the business\' average grade')
+    plt.show()
+    return p
 
 
 def grade_categories():
