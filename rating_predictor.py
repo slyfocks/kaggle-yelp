@@ -9,7 +9,6 @@ import business_analysis as banal
 import funny_useful_cool as fuc
 import user_analysis as ua
 
-#right now the code is agnostic to business data. coming shortly...
 with open('yelp_test_set_user.json') as file:
     data = [json.loads(line) for line in file]
 #convert names to all lowercase for alphabetizing purposes
@@ -19,6 +18,7 @@ with open('yelp_test_set_review.json') as file:
     review_data = [json.loads(line) for line in file]
 user_ids = [entry['user_id'] for entry in review_data]
 business_ids = [entry['business_id'] for entry in review_data]
+
 
 def names(user_ids):
     names = []
@@ -144,7 +144,7 @@ def mess():
 def main():
     #user_ids is test set_review_ids
     name_list = names(user_ids)
-    gender_ratings = gender_means_recommendation(genders(name_list))
+    gender_ratings = gender.id_gender()
     mean_stars = fuc.mean_user_stars()
 
     #for users in training user set
@@ -166,8 +166,8 @@ def main():
     test_businesses = banal.review_test_businesses()
     training_businesses = banal.review_training_businesses()
     training_review_businesses = list(banal.id_stars().keys())
-    test_categories = [banal.categories(entry) for entry in test_businesses]
-    training_categories = [banal.categories(entry) for entry in training_businesses]
+    #test_categories = [banal.categories(entry) for entry in test_businesses]
+    #training_categories = [banal.categories(entry) for entry in training_businesses]
     expected_business_rating = banal.predicted_business_rating()
 
     #funny_useful_cool stuff
@@ -240,7 +240,6 @@ def main():
                   + user_stars_review*np.log(review_count_reviews) + user_gender_rating)/(2*np.log(review_count_reviews)
                                                                                           + np.log(review_count)) + 1)
         user_ratings[user] = rating
-
 
     #business stuff, fill this
     for business in training_review_businesses:
