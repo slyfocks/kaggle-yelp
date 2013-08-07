@@ -4,7 +4,7 @@ import numpy as np
 import csv
 import matplotlib.pyplot as plt
 import gender
-import review_parse
+import review_parse as rp
 import business_analysis as banal
 import funny_useful_cool as fuc
 import user_analysis as ua
@@ -18,7 +18,7 @@ id_names = {entry['user_id']: entry['name'].strip().lower() for entry in data}
 with open('yelp_test_set_review.json') as file:
     review_data = [json.loads(line) for line in file]
 user_ids = [entry['user_id'] for entry in review_data]
-
+business_ids = [entry['business_id'] for entry in review_data]
 
 def names(user_ids):
     names = []
@@ -56,7 +56,7 @@ def gender_means_recommendation(gender_list):
 
 #takes user_id:stars and user_id:grade_level and creates stars:grade_level
 def stars_grades():
-    id_grades = review_parse.id_grades()
+    id_grades = rp.id_grades()
     id_star = gender.id_stars()
     grades_keys = id_grades.keys()
     star_keys = id_star.keys()
@@ -69,7 +69,7 @@ def stars_grade_lists():
 
 
 def reviews_grades():
-    id_grades = review_parse.id_grades()
+    id_grades = rp.id_grades()
     id_review = gender.id_reviews()
     grades_keys = id_grades.keys()
     review_keys = id_review.keys()
@@ -83,8 +83,8 @@ def reviews_grade_lists():
 
 #star rating and grade_level for a particular review
 def grade_star_lists():
-    grades = review_parse.grade_stars().keys()
-    stars = list(review_parse.grade_stars().values())
+    grades = rp.grade_stars().keys()
+    stars = list(rp.grade_stars().values())
     return [grades, stars]
 
 
@@ -142,6 +142,7 @@ def mess():
 
 
 def main():
+    #user_ids is test_set_review_ids
     name_list = names(user_ids)
     gender_ratings = gender_means_recommendation(genders(name_list))
     #this variable will be for users who have writing samples available
