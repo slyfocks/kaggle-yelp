@@ -201,7 +201,8 @@ def main():
         user_gender_rating = gender_ratings[user]
         user_stars = id_stars_dict[user]
         review_count = id_reviews[user]
-        #rating =
+        rating = (np.log(review_count)*user_stars + user_gender_rating)/(np.log(review_count) + 1)
+        user_ratings[user] = rating
     for user in (parse_review_users and training_users):
         #rating =
     for user in (parse_review_users and test_users):
@@ -238,6 +239,7 @@ def main():
         review_count = id_reviews[user]
         #rating =
     for user in (parse_review_users and training_users):
+        user_review_rating = parse_ratings[user]
         #rating =
     for user in (parse_review_users and test_users):
         review_count = test_count
