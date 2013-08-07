@@ -142,19 +142,119 @@ def mess():
 
 
 def main():
-    #user_ids is test_set_review_ids
+    #user_ids is test set_review_ids
     name_list = names(user_ids)
     gender_ratings = gender_means_recommendation(genders(name_list))
-    #this variable will be for users who have writing samples available
+    test_count = data['review_count']
+    mean_stars = fuc.mean_user_stars()[user]
+
+    #for users in training user set
+    id_stars_dict = gender.id_stars()
+    id_reviews = gender.id_reviews()
+
+    #user_id stuff
+    test_users = ua.review_test_users()
+    training_users = ua.review_training_users()
+    all_groups = ua.all_group_users()
+
+    #these variables will be for users who have writing samples available
     parse_review_users = ua.review_training_test_users()
     parse_ratings = ua.user_review_parse_rating()
-    for i in range(len(user_ids)):
-        if user_ids[i] in parse_review_users:
-            parse_ratings[user_ids[i]]
+    review_user_stars = rp.id_stars()
+    stars_average = rp.id_stars_avg()
+
+    #business stuff
+    test_businesses = banal.review_test_businesses()
+    training_businesses = banal.review_test_businesses()
+    test_categories = [banal.categories(entry) for entry in test_businesses]
+    training_categories = [banal.categories(entry) for entry in training_businesses]
+
+    #funny_useful_cool stuff
+    fuc_rating_dict = fuc.predicted_rating()
+    #where final ratings go for users
+    user_ratings = {}
+
+    #where final ratings go for businesses
+    business_ratings = {}
+
+
+    #in case all of these loops don't contain certain users, initialize all users to the mean
+    for user in user_ids:
+        user_ratings[user] = mean_stars
+
+    for user in training_users:
+        user_gender_rating = gender_ratings[user]
+        user_stars = id_stars_dict[user]
+        review_count = id_reviews[user]
+        rating = (np.log(review_count)*user_stars + user_gender_rating)/(np.log(review_count) + 1)
+        user_ratings[user] = rating
+    for user in test_users:
+        user_gender_rating = gender_ratings[user]
+        rating = user_gender_rating
+        user_ratings[user] = rating
+    for user in parse_review_users:
+        user_review_rating = parse_ratings[user]
+        user_stars = stars_average[user]
+        review_count = len(review_user_stars[user])
+        rating = user_review_rating
+    for user in (test_users and training_users):
+        user_gender_rating = gender_ratings[user]
+        user_stars = id_stars_dict[user]
+        review_count = id_reviews[user]
+        #rating =
+    for user in (parse_review_users and training_users):
+        #rating =
+    for user in (parse_review_users and test_users):
+        review_count = test_count
+        user_gender_rating = gender_ratings[user]
+        #rating =
+    for user in all_groups:
+        user_gender_rating = gender_ratings[user]
+        user_review_rating = parse_ratings[user]
+        fuc_rating = fuc_rating_dict[user]
+        user_stars = id_stars_dict[user]
+        review_count = id_reviews[user]
+        #rating =
+
+    #business stuff, fill this
+    for business in training_businesses:
+        business_gender_rating = gender_ratings[business]
+        business_stars = id_stars_dict[business]
+        review_count = id_reviews[user]
+        rating = (np.log(review_count)*user_stars + user_gender_rating)/(np.log(review_count) + 1)
+        business_ratings[business] = rating
+    for user in test_users:
+        user_gender_rating = gender_ratings[user]
+        rating = user_gender_rating
+        user_ratings[user] = rating
+    for user in parse_review_users:
+        user_review_rating = parse_ratings[user]
+        user_stars = stars_average[user]
+        review_count = len(review_user_stars[user])
+        rating = user_review_rating
+    for user in (test_users and training_users):
+        user_gender_rating = gender_ratings[user]
+        user_stars = id_stars_dict[user]
+        review_count = id_reviews[user]
+        #rating =
+    for user in (parse_review_users and training_users):
+        #rating =
+    for user in (parse_review_users and test_users):
+        review_count = test_count
+        user_gender_rating = gender_ratings[user]
+        #rating =
+    for user in all_groups:
+        user_gender_rating = gender_ratings[user]
+        user_review_rating = parse_ratings[user]
+        fuc_rating = fuc_rating_dict[user]
+        user_stars = id_stars_dict[user]
+        review_count = id_reviews[user]
+        #rating =
     keys = ['RecommendationId', 'Stars']
     f = open('businesspeoplemod.csv', 'w')
     dict_writer = csv.DictWriter(f, keys)
     dict_writer.writer.writerow(keys)
     dict_writer.writerows(gender_ratings)
+
 if __name__ == '__main__':
     main()
