@@ -189,11 +189,12 @@ def group_diffs():
     #stars sorted by corresponding grades
     sorted_stars = sort_diffs()
     sorted_grades = sorted(diff_pair()[1])
-    grade_star_dict = {str(sorted_grades[4907]): sorted_stars[:4907]}
-    for i in range(9907, len(sorted_stars), 5000):
+    grade_star_dict = {str(sorted_grades[4906]): sorted_stars[:4906]}
+    for i in range(9906, len(sorted_stars), 5000):
         grade_star_dict[str(sorted_grades[i])] = sorted_stars[i-5000:i]
+        print(i)
     return grade_star_dict
-
+print(group_diffs())
 
 def partitions():
     return np.sort(list(group_diffs().keys()))
