@@ -19,6 +19,9 @@ with open('yelp_test_set_review.json') as file:
 user_ids = [entry['user_id'] for entry in review_data]
 business_ids = [entry['business_id'] for entry in review_data]
 
+with open('yelp_training_set_user.json') as file:
+    training_data = [json.loads(user) for user in file]
+
 
 def names(user_ids):
     names = []
@@ -52,6 +55,14 @@ def gender_means_recommendation(gender_list):
         else:
             gender_means.append({'RecommendationId': index+1, 'Stars': both_mean_stars})
     return gender_means
+
+
+def id_stars():
+    return {member['user_id']: member['average_stars'] for member in training_data}
+
+
+def id_review_dict():
+    return {member['user_id']: member['review_count'] for member in training_data}
 
 
 #takes user_id:stars and user_id:grade_level and creates stars:grade_level
@@ -145,11 +156,15 @@ def main():
     #user_ids is test set_review_ids
     gender_ratings = gender.id_gender()
     test_gender_ratings = gender.test_id_gender()
+    female_mean = gender.training_mean('female')
+    male_mean = gender.training_mean('male')
+    unknown_mean = gender.training_mean('unknown')
+    both_mean = gender.training_mean('both')
     mean_stars = fuc.mean_user_stars()
 
     #for users in training user set
-    id_stars_dict = gender.id_stars()
-    id_reviews = gender.id_reviews()
+    id_stars_dict = id_stars()
+    id_reviews = id_review_dict()
 
     #user_id stuff
     test_users = ua.review_test_users()
@@ -162,7 +177,8 @@ def main():
     parse_review_users = ua.review_training_test_users()
     parse_ratings = ua.user_review_parse_rating()
     review_user_stars = rp.id_stars()
-    stars_average = rp.id_stars_avg()
+    review_stars_average = rp.id_stars_avg()
+
 
     #business stuff
     test_businesses = banal.review_test_businesses()
@@ -174,75 +190,153 @@ def main():
 
     #funny_useful_cool stuff
     fuc_rating_dict = fuc.predicted_rating()
+
     #where final ratings go for users
     user_ratings = {}
 
     #where final ratings go for businesses
     business_ratings = {}
-
+    i = 0
     #in case all of these loops don't contain certain users, initialize all users to the mean
     for user in user_ids:
         user_ratings[user] = mean_stars
-
+        i+=1
+        print(i)
     for user in training_users:
-        user_gender_rating = gender.training_mean(gender_ratings[user])
+        if gender_ratings[user] == 'female':
+            user_gender_rating = female_mean
+        elif gender_ratings[user] == 'male':
+            user_gender_rating = male_mean
+        elif gender_ratings[user] == 'unknown':
+            user_gender_rating = unknown_mean
+        else:
+            user_gender_rating = both_mean
         user_stars = id_stars_dict[user]
         review_count = id_reviews[user]
         rating = (np.log(review_count)*user_stars + user_gender_rating)/(np.log(review_count) + 1)
         user_ratings[user] = rating
-
+        i+=1
+        print(i)
     for user in test_users:
-        user_gender_rating = gender.training_mean(test_gender_ratings[user])
+        if test_gender_ratings[user] == 'female':
+            user_gender_rating = female_mean
+        elif test_gender_ratings[user] == 'male':
+            user_gender_rating = male_mean
+        elif test_gender_ratings[user] == 'unknown':
+            user_gender_rating = unknown_mean
+        else:
+            user_gender_rating = both_mean
         rating = user_gender_rating
         user_ratings[user] = rating
-
+        i+=1
+        print(i)
     for user in parse_review_users:
-        user_review_rating = parse_ratings[user]
-        user_stars = stars_average[user]
+        try:
+            user_review_rating = parse_ratings[user]
+        except KeyError:
+            user_review_rating = mean_stars
+        user_stars = review_stars_average[user]
         review_count = len(review_user_stars[user])
-        rating = user_review_rating + user_stars*np.log(review_count)
+        rating = (user_review_rating + user_stars*np.log(review_count))/(1 + np.log(review_count))
         user_ratings[user] = rating
-
+        i+=1
+        print(i)
     for user in (test_users and training_users):
-        user_gender_rating = gender.training_mean(gender_ratings[user])
+        if gender_ratings[user] == 'female':
+            user_gender_rating = female_mean
+        elif gender_ratings[user] == 'male':
+            user_gender_rating = male_mean
+        elif gender_ratings[user] == 'unknown':
+            user_gender_rating = unknown_mean
+        else:
+            user_gender_rating = both_mean
         user_stars = id_stars_dict[user]
         review_count = id_reviews[user]
         rating = (np.log(review_count)*user_stars + user_gender_rating)/(np.log(review_count) + 1)
         user_ratings[user] = rating
+        i+=1
+        print(i)
+        j = 0
 
     for user in (parse_review_users and training_users):
-        user_gender_rating = gender.training_mean(gender_ratings[user])
-        user_review_rating = parse_ratings[user]
+        if gender_ratings[user] == 'female':
+            user_gender_rating = female_mean
+        elif gender_ratings[user] == 'male':
+            user_gender_rating = male_mean
+        elif gender_ratings[user] == 'unknown':
+            user_gender_rating = unknown_mean
+        else:
+            user_gender_rating = both_mean
+        try:
+            user_review_rating = parse_ratings[user]
+        except KeyError:
+            user_review_rating = mean_stars
+            j += 1
+            print(j)
         user_stars = id_stars_dict[user]
-        user_stars_review = stars_average[user]
+        user_stars_review = review_stars_average[user]
         review_count = id_reviews[user]
         review_count_reviews = len(review_user_stars[user])
         rating = ((np.log(review_count_reviews)*user_review_rating + user_stars*np.log(review_count)
                   + user_stars_review*np.log(review_count_reviews) + user_gender_rating)/(2*np.log(review_count_reviews)
-                                                                                          + np.log(review_count)) + 1)
+                                                                                          + np.log(review_count) + 1))
         user_ratings[user] = rating
-
+        i+=1
+        print(i)
     for user in (parse_review_users and test_users):
-        user_gender_rating = gender.training_mean(test_gender_ratings[user])
-        user_review_rating = parse_ratings[user]
-        user_stars = id_stars_dict[user]
-        review_count_reviews = len(review_user_stars[user])
+        if test_gender_ratings[user] == 'female':
+            user_gender_rating = female_mean
+        elif test_gender_ratings[user] == 'male':
+            user_gender_rating = male_mean
+        elif test_gender_ratings[user] == 'unknown':
+            user_gender_rating = unknown_mean
+        else:
+            user_gender_rating = both_mean
+        try:
+            user_review_rating = parse_ratings[user]
+        except KeyError:
+            user_review_rating = mean_stars
+            j += 1
+            print(j)
+        try:
+            review_count_reviews = len(review_user_stars[user])
+        except KeyError:
+            review_count_reviews = 1
+            j += 1
+            print(j)
         rating = (user_gender_rating + user_review_rating*np.log(review_count_reviews))/(np.log(review_count_reviews)
                                                                                          + 1)
         user_ratings[user] = rating
-
-    for user in all_groups:
-        user_gender_rating = gender.training_mean(gender_ratings[user])
-        user_review_rating = parse_ratings[user]
-        user_stars = id_stars_dict[user]
-        user_stars_review = stars_average[user]
+        i+=1
+        print(i)
+    '''for user in all_groups:
+        if test_gender_ratings[user] == 'female':
+            user_gender_rating = female_mean
+        elif test_gender_ratings[user] == 'male':
+            user_gender_rating = male_mean
+        elif test_gender_ratings[user] == 'unknown':
+            user_gender_rating = unknown_mean
+        else:
+            user_gender_rating = both_mean
+        try:
+            user_review_rating = parse_ratings[user]
+        except KeyError:
+            user_review_rating = mean_stars
+            j += 1
+            print(j)
+        try:
+            user_stars = id_stars_dict[user]
+        except KeyError:
+            user_stars = mean_stars
+        user_stars_review = review_stars_average[user]
         review_count = id_reviews[user]
         review_count_reviews = len(review_user_stars[user])
         rating = ((np.log(review_count_reviews)*user_review_rating + user_stars*np.log(review_count)
                   + user_stars_review*np.log(review_count_reviews) + user_gender_rating)/(2*np.log(review_count_reviews)
                                                                                           + np.log(review_count)) + 1)
         user_ratings[user] = rating
-
+        i+=1
+        print(i)'''
     #business stuff, fill this
     for business in training_review_businesses:
         rating = mean_stars
@@ -252,7 +346,7 @@ def main():
         review_count = id_reviews[user]
         rating = (np.log(review_count)*business_stars + user_gender_rating)/(np.log(review_count) + 1)
         business_ratings[business] = rating'''
-        rating = expected_business_rating
+        rating = expected_business_rating[business]
         business_ratings[business] = rating
     '''for business in test_businesses:
         user_gender_rating = gender_ratings[user]
@@ -283,12 +377,15 @@ def main():
         review_count = id_reviews[user]
         #rating ='''
     with open('yelp_test_set_review.json') as file:
-        datas = [json.loads(entry) for entry in file]
+        final_data = [json.loads(entry) for entry in file]
         ratings = []
-        for i in range(len(datas)):
-            rating = (user_ratings[datas[i]['user_id']] + business_ratings[datas[i]['business_id']])/2
+        for i in range(len(final_data)):
+            try:
+                rating = (user_ratings[final_data[i]['user_id']] + business_ratings[final_data[i]['business_id']])/2
+            except KeyError:
+                rating = (user_ratings[final_data[i]['user_id']])
             ratings.append({'RecommendationId': i+1, 'Stars': rating})
-        keys = ['RecommendationId', 'Stars']
+    keys = ['RecommendationId', 'Stars']
     f = open('complex.csv', 'w')
     dict_writer = csv.DictWriter(f, keys)
     dict_writer.writer.writerow(keys)
