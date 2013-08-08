@@ -333,7 +333,7 @@ def main():
                 rating = (user_ratings[final_data[i]['user_id']])
             ratings.append({'RecommendationId': i+1, 'Stars': rating})
     keys = ['RecommendationId', 'Stars']
-    f = open('complex.csv', 'w')
+    f = open('funnyusefulcool.csv', 'w')
     dict_writer = csv.DictWriter(f, keys)
     dict_writer.writer.writerow(keys)
     dict_writer.writerows(ratings)
