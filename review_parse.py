@@ -37,7 +37,7 @@ def id_grades():
 #makes list of user_ids in training review set. no duplicates!
 def training_review_ids():
     id_grade_dict = id_grades()
-    return [user_id for user_id in id_grade_dict.keys()]
+    return [user_id for user_id in list(id_grade_dict.keys())]
 
 
 #returns dict of user_ids and their average review grade level
@@ -102,7 +102,7 @@ def grade_partitioned_dict():
     partition_list = []
     grade_star_dict = {}
     grade_grade_dict = {}
-    for i in range(4907, len(sorted_grade_list), 5000):
+    for i in range(4906, len(sorted_grade_list), 5000):
         partition_list.append(sorted_grade_list[i])
         grade_star_dict[str(sorted_grade_list[i])] = []
         grade_grade_dict[str(sorted_grade_list[i])] = []
