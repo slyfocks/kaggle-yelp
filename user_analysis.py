@@ -3,6 +3,7 @@ __author__ = 'slyfocks'
 import numpy as np
 import json
 import review_parse as rp
+import csv
 
 with open('yelp_test_set_user.json') as file:
     test_user_data = [json.loads(user) for user in file]
@@ -32,20 +33,29 @@ def review_test_users():
     return [user_id for user_id in test_users() if user_id in test_review_users]
 
 
+def training_review_ids():
+    with open('grade_id_pairs.csv') as file:
+        contents = csv.reader(file, delimiter=',')
+        users = [review[0] for review in contents]
+    return users
+
+
 #finds the intersection of training_review users and test_review users: len = 6611
 def review_training_test_users():
-    training_review_id_list = rp.training_review_ids()
-    return [user_id for user_id in training_review_id_list if user_id in test_review_users]
+    training_review_id_list = training_review_ids()
+    return [user_id for user_id in set(training_review_id_list).intersection(test_review_users)]
 
 
 def all_group_users():
     test_user_list = test_users()
     training_user_list = training_users()
-    training_review_id_list = rp.training_review_ids()
-    return [user_id for user_id in training_review_id_list if user_id in (training_user_list and test_user_list)]
+    training_review_id_list = training_review_ids()
+    return [user_id for user_id in training_review_id_list
+            if user_id in set(training_user_list).intersection(test_user_list)]
 
 
 #takes in user_ids, outputs dict of user_ids and predicted mean
+#this function is messing things up, feel free to ignore it
 def user_review_parse_rating():
     user_grades = rp.id_grade_avg()
     partitions = rp.partitions()
@@ -55,7 +65,11 @@ def user_review_parse_rating():
     for user_id in review_training_test_users():
         grade = user_grades[user_id]
         for i in range(len(partitions)):
+            if float(partitions[i]) > 115:
+                if grade > 9.25296536797:
+                    user_rating_dict[user_id] = partition_mean_stds[partitions[i]][0]
+                break
             if grade < float(partitions[i]):
-                user_rating_dict[user_id] = partition_mean_stds[partitions[i]]
+                user_rating_dict[user_id] = partition_mean_stds[partitions[i]][0]
                 break
     return user_rating_dict
