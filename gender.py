@@ -65,7 +65,7 @@ def id_gender():
     primary_guesser = NameGender("gender_guesser/us_census_1990_males", "gender_guesser/us_census_1990_females")
     secondary_guesser = NameGender("gender_guesser/popular_1960_2010_males", "gender_guesser/popular_1960_2010_females")
     id_gender = {}
-    for member in (data or test_data):
+    for member in data:
         name = member['name'].strip().lower()
         gender = get_decision(primary_guesser, name)
         if gender in ["male", "female", "both"]:
@@ -186,3 +186,5 @@ def statistics(data):
 def training_mean(gender):
     #returns mean stars for each gender
     return statistics(data)[gender][1][0]
+
+
