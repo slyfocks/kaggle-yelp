@@ -97,6 +97,7 @@ def sort_grades(num):
 def grade_partitioned_dict():
     #high number so all the grades are included
     sorted_grade_list = sort_grades(1000)
+    print(sorted_grade_list)
     grade_star_list = grades_stars()
     grades = grade_star_list[0]
     stars = grade_star_list[1]
