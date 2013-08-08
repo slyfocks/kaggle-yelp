@@ -183,6 +183,7 @@ def main():
         rating = user_gender_rating
         user_ratings[user] = rating
 
+    #SHOULD NOT BE USING USER_REVIEW_RATING IN RATING CALCULATION, IT IS >5 SOMETIMES
     for user in parse_review_users:
         try:
             user_review_rating = parse_avg[user]
@@ -192,6 +193,7 @@ def main():
         review_count = len(review_user_stars[user])
         rating = (user_review_rating + user_stars*np.log(review_count))/(1 + np.log(review_count))
         user_ratings[user] = rating
+
 
     for user in set(test_users).intersection(training_users):
         if gender_ratings[user] == 'female':
@@ -210,6 +212,7 @@ def main():
                   + fuc_rating*np.log(fuc_count))/(np.log(review_count) + np.log(fuc_count) + 1))
         user_ratings[user] = rating
 
+    #SHOULD NOT BE USING USER_REVIEW_RATING IN RATING CALCULATION, IT IS >5 SOMETIMES
     for user in set(parse_review_users).intersection(training_users):
         if gender_ratings[user] == 'female':
             user_gender_rating = female_mean
@@ -236,6 +239,7 @@ def main():
                                                    + np.log(fuc_count) + 1))
         user_ratings[user] = rating
 
+    #SHOULD NOT BE USING USER_REVIEW_RATING IN RATING CALCULATION, IT IS >5 SOMETIMES
     for user in set(parse_review_users).intersection(test_users):
         if test_gender_ratings[user] == 'female':
             user_gender_rating = female_mean
@@ -258,6 +262,7 @@ def main():
                                                                                           + 1))
         user_ratings[user] = rating
 
+    #SHOULD NOT BE USING USER_REVIEW_RATING IN RATING CALCULATION, IT IS >5 SOMETIMES
     for user in all_groups:
         if test_gender_ratings[user] == 'female':
             user_gender_rating = female_mean
