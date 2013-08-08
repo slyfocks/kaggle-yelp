@@ -36,15 +36,17 @@ def id_grades():
 
 #makes list of user_ids in training review set. no duplicates!
 def training_review_ids():
-    id_grade_dict = id_grades()
-    return [user_id for user_id in list(id_grade_dict.keys())]
+    with open('grade_id_pairs.csv') as file:
+        contents = csv.reader(file, delimiter=',')
+        users = [review[0] for review in contents]
+    return users
 
 
 #returns dict of user_ids and their average review grade level
 def id_grade_avg():
     grade_dict = id_grades()
     avg_grade_dict = {}
-    for user_id in list(grade_dict.keys()):
+    for user_id in training_review_ids():
         grade_list = grade_dict[user_id]
         avg_grade_dict[user_id] = sum(grade_list)/len(grade_list)
     return avg_grade_dict
