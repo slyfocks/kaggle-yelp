@@ -165,10 +165,12 @@ def main():
         #fuc rating given on 1-5 scale based on lms regression on funny, useful, cool ratings and star ratings
         fuc_rating = fuc_rating_dict[user]
         fuc_count = total_fuc_ratings[user]
-        rating = (np.log(review_count)*user_stars + user_gender_rating
-                  + fuc_rating*np.log(fuc_count))/(np.log(review_count) + np.log(fuc_count) + 1)
+        rating = ((np.log(review_count)*user_stars + user_gender_rating
+                  + fuc_rating*np.log(fuc_count))/(np.log(review_count) + np.log(fuc_count) + 1))
         user_ratings[user] = rating
 
+    #in the future, must make test user predictions more accurate
+    # by adding review count correlation with post intelligence
     for user in test_users:
         if test_gender_ratings[user] == 'female':
             user_gender_rating = female_mean
@@ -204,8 +206,8 @@ def main():
         review_count = id_reviews[user]
         fuc_rating = fuc_rating_dict[user]
         fuc_count = total_fuc_ratings[user]
-        rating = (np.log(review_count)*user_stars + user_gender_rating
-                  + fuc_rating*np.log(fuc_count))/(np.log(review_count) + np.log(fuc_count) + 1)
+        rating = ((np.log(review_count)*user_stars + user_gender_rating
+                  + fuc_rating*np.log(fuc_count))/(np.log(review_count) + np.log(fuc_count) + 1))
         user_ratings[user] = rating
 
     for user in set(parse_review_users).intersection(training_users):
@@ -250,9 +252,10 @@ def main():
         try:
             review_count_reviews = len(review_user_stars[user])
         except KeyError:
-            review_count_reviews = 1
-        rating = (user_gender_rating + user_review_rating*np.log(review_count_reviews))/(np.log(review_count_reviews)
-                                                                                         + 1)
+            review_count_reviews = 1.0
+            print('error')
+        rating = ((user_gender_rating + user_review_rating*np.log(review_count_reviews))/(np.log(review_count_reviews)
+                                                                                          + 1))
         user_ratings[user] = rating
 
     for user in all_groups:
@@ -277,7 +280,7 @@ def main():
         review_count_reviews = len(review_user_stars[user])
         fuc_rating = fuc_rating_dict[user]
         fuc_count = total_fuc_ratings[user]
-        rating = ((np.log(review_count_reviews)*user_review_rating + user_stars*np.log(review_count)
+        rating = ((user_review_rating*np.log(review_count_reviews) + user_stars*np.log(review_count)
                   + user_stars_review*np.log(review_count_reviews) + user_gender_rating
                   + fuc_rating*np.log(fuc_count))/(2*np.log(review_count_reviews)
                                                    + np.log(review_count)
@@ -333,7 +336,7 @@ def main():
                 rating = (user_ratings[final_data[i]['user_id']])
             ratings.append({'RecommendationId': i+1, 'Stars': rating})
     keys = ['RecommendationId', 'Stars']
-    f = open('funnyusefulcool.csv', 'w')
+    f = open('funnyusefulcool2.csv', 'w')
     dict_writer = csv.DictWriter(f, keys)
     dict_writer.writer.writerow(keys)
     dict_writer.writerows(ratings)
