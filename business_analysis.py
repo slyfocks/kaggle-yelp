@@ -65,6 +65,10 @@ def id_categories():
     return {entry['business_id']: entry['categories'] for entry in training_business_data}
 
 
+def test_id_categories():
+    return {entry['business_id']: entry['categories'] for entry in test_business_data}
+
+
 def category_set(business_data):
     #puts the categories in each of the lists into one master list without repetition
     return set([category for entry in business_data for category in categories(entry)])
