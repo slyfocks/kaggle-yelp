@@ -368,9 +368,15 @@ def main():
         ratings = []
         for i in range(len(final_data)):
             try:
-                rating = (user_ratings[final_data[i]['user_id']] + business_ratings[final_data[i]['business_id']])/2
+                #calculate writing level difference
+                diff = user_grades[final_data[i]['user_id']] - business_grades[final_data[i]['business_id']]
+                #and then calculate expected contribution to star rating prediction for user business pair
+                #grade_diff_influence = #CONVERT DIFFERENCE TO + OR -
             except KeyError:
-                rating = (user_ratings[final_data[i]['user_id']])
+                grade_diff_influence = 0
+            rating = ((user_ratings[final_data[i]['user_id']]
+                      + business_ratings[final_data[i]['business_id']])/2
+                      + grade_diff_influence)
             ratings.append({'RecommendationId': i+1, 'Stars': rating})
     keys = ['RecommendationId', 'Stars']
     f = open('funnyusefulcool2.csv', 'w')
