@@ -164,7 +164,7 @@ def main():
         review_count = id_reviews[user]
         #fuc rating given on 1-5 scale based on lms regression on funny, useful, cool ratings and star ratings
         fuc_rating = fuc_rating_dict[user]
-        fuc_count = total_fuc_ratings[user]
+        fuc_count = total_fuc_ratings[user] + 1
         rating = ((np.log(review_count)*user_stars + user_gender_rating
                   + fuc_rating*np.log(fuc_count))/(np.log(review_count) + np.log(fuc_count) + 1))
         user_ratings[user] = rating
@@ -183,17 +183,11 @@ def main():
         rating = user_gender_rating
         user_ratings[user] = rating
 
-    #SHOULD NOT BE USING USER_REVIEW_RATING IN RATING CALCULATION, IT IS >5 SOMETIMES
     for user in parse_review_users:
-        try:
-            user_review_rating = parse_avg[user]
-        except KeyError:
-            user_review_rating = mean_stars
         user_stars = review_stars_average[user]
         review_count = len(review_user_stars[user])
-        rating = (user_review_rating + user_stars*np.log(review_count))/(1 + np.log(review_count))
+        rating = (user_stars*np.log(review_count))/(np.log(review_count))
         user_ratings[user] = rating
-
 
     for user in set(test_users).intersection(training_users):
         if gender_ratings[user] == 'female':
@@ -207,12 +201,11 @@ def main():
         user_stars = id_stars_dict[user]
         review_count = id_reviews[user]
         fuc_rating = fuc_rating_dict[user]
-        fuc_count = total_fuc_ratings[user]
+        fuc_count = total_fuc_ratings[user] + 1
         rating = ((np.log(review_count)*user_stars + user_gender_rating
                   + fuc_rating*np.log(fuc_count))/(np.log(review_count) + np.log(fuc_count) + 1))
         user_ratings[user] = rating
 
-    #SHOULD NOT BE USING USER_REVIEW_RATING IN RATING CALCULATION, IT IS >5 SOMETIMES
     for user in set(parse_review_users).intersection(training_users):
         if gender_ratings[user] == 'female':
             user_gender_rating = female_mean
@@ -222,24 +215,19 @@ def main():
             user_gender_rating = unknown_mean
         else:
             user_gender_rating = both_mean
-        try:
-            user_review_rating = parse_avg[user]
-        except KeyError:
-            user_review_rating = mean_stars
         user_stars = id_stars_dict[user]
         user_stars_review = review_stars_average[user]
         review_count = id_reviews[user]
         review_count_reviews = len(review_user_stars[user])
         fuc_rating = fuc_rating_dict[user]
-        fuc_count = total_fuc_ratings[user]
-        rating = ((np.log(review_count_reviews)*user_review_rating + user_stars*np.log(review_count)
+        fuc_count = total_fuc_ratings[user] + 1
+        rating = ((user_stars*np.log(review_count)
                   + user_stars_review*np.log(review_count_reviews) + user_gender_rating
-                  + fuc_rating*np.log(fuc_count))/(2*np.log(review_count_reviews)
+                  + fuc_rating*np.log(fuc_count))/(np.log(review_count_reviews)
                                                    + np.log(review_count)
                                                    + np.log(fuc_count) + 1))
         user_ratings[user] = rating
 
-    #SHOULD NOT BE USING USER_REVIEW_RATING IN RATING CALCULATION, IT IS >5 SOMETIMES
     for user in set(parse_review_users).intersection(test_users):
         if test_gender_ratings[user] == 'female':
             user_gender_rating = female_mean
@@ -250,7 +238,7 @@ def main():
         else:
             user_gender_rating = both_mean
         try:
-            user_review_rating = parse_avg[user]
+            user_review_rating = review_stars_average[user]
         except KeyError:
             user_review_rating = mean_stars
         try:
@@ -258,11 +246,9 @@ def main():
         except KeyError:
             review_count_reviews = 1.0
             print('error')
-        rating = ((user_gender_rating + user_review_rating*np.log(review_count_reviews))/(np.log(review_count_reviews)
-                                                                                          + 1))
+        rating = user_gender_rating
         user_ratings[user] = rating
 
-    #SHOULD NOT BE USING USER_REVIEW_RATING IN RATING CALCULATION, IT IS >5 SOMETIMES
     for user in all_groups:
         if test_gender_ratings[user] == 'female':
             user_gender_rating = female_mean
@@ -273,10 +259,6 @@ def main():
         else:
             user_gender_rating = both_mean
         try:
-            user_review_rating = parse_avg[user]
-        except KeyError:
-            user_review_rating = mean_stars
-        try:
             user_stars = id_stars_dict[user]
         except KeyError:
             user_stars = mean_stars
@@ -284,8 +266,8 @@ def main():
         review_count = id_reviews[user]
         review_count_reviews = len(review_user_stars[user])
         fuc_rating = fuc_rating_dict[user]
-        fuc_count = total_fuc_ratings[user]
-        rating = ((user_review_rating*np.log(review_count_reviews) + user_stars*np.log(review_count)
+        fuc_count = total_fuc_ratings[user] + 1
+        rating = ((user_stars*np.log(review_count)
                   + user_stars_review*np.log(review_count_reviews) + user_gender_rating
                   + fuc_rating*np.log(fuc_count))/(2*np.log(review_count_reviews)
                                                    + np.log(review_count)
