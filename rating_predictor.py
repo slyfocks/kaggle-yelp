@@ -132,8 +132,8 @@ def main():
     test_businesses = banal.review_test_businesses()
     training_businesses = banal.review_training_businesses()
     training_review_businesses = list(banal.id_stars().keys())
-    test_categories = {entry: banal.categories(entry) for entry in test_businesses}
-    training_categories = {entry: banal.categories(entry) for entry in training_businesses}
+    test_categories = banal.test_id_categories()
+    training_categories = banal.id_categories()
     grade_category_dict = banal.grade_categories_avg()
     global_grade_mean = sum(grade_category_dict.values())/len(grade_category_dict.values())
     expected_business_rating = banal.predicted_business_rating()
