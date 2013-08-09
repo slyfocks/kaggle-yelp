@@ -128,14 +128,20 @@ def main():
     review_user_stars = rp.id_stars()
     review_stars_average = rp.id_stars_avg()
 
-
     #business stuff
     test_businesses = banal.review_test_businesses()
     training_businesses = banal.review_training_businesses()
     training_review_businesses = list(banal.id_stars().keys())
-    #test_categories = [banal.categories(entry) for entry in test_businesses]
-    #training_categories = [banal.categories(entry) for entry in training_businesses]
+    test_categories = {entry: banal.categories(entry) for entry in test_businesses}
+    training_categories = {entry: banal.categories(entry) for entry in training_businesses}
+    grade_category_dict = banal.grade_categories_avg()
+    global_grade_mean = sum(grade_category_dict.values())/len(grade_category_dict.values())
     expected_business_rating = banal.predicted_business_rating()
+    business_grade_avg = banal.id_grade_avg()
+
+    #for training_review_businesses only!
+    business_star_avg = banal.id_star_avg()
+    business_stars_list = banal.id_stars()
 
     #funny_useful_cool stuff, for training users only!
     fuc_rating_dict = fuc.predicted_rating()
@@ -143,9 +149,11 @@ def main():
 
     #where final ratings go for users
     user_ratings = {}
-
+    #where user average grade levels go
+    user_grades = {}
     #where final ratings go for businesses
     business_ratings = {}
+    business_grades = {}
 
     #in case all of these loops don't contain certain users, initialize all users to the mean
     for user in user_ids:
@@ -186,8 +194,10 @@ def main():
     for user in parse_review_users:
         user_stars = review_stars_average[user]
         review_count = len(review_user_stars[user])
-        rating = (user_stars*np.log(review_count))/(np.log(review_count))
+        rating = (user_stars*np.log(review_count) + mean_stars)/(np.log(review_count) + 1)
         user_ratings[user] = rating
+        #create entry in grade dictionary for user writing grade
+        user_grades[user] = parse_avg[user]
 
     for user in set(test_users).intersection(training_users):
         if gender_ratings[user] == 'female':
@@ -227,6 +237,7 @@ def main():
                                                    + np.log(review_count)
                                                    + np.log(fuc_count) + 1))
         user_ratings[user] = rating
+        user_grades[user] = parse_avg[user]
 
     for user in set(parse_review_users).intersection(test_users):
         if test_gender_ratings[user] == 'female':
@@ -246,8 +257,13 @@ def main():
         except KeyError:
             review_count_reviews = 1.0
             print('error')
-        rating = user_gender_rating
+        user_stars = review_stars_average[user]
+        review_count = len(review_user_stars[user])
+        rating = (user_stars*np.log(review_count) + user_gender_rating
+                  + user_review_rating*np.log(review_count_reviews))/(np.log(review_count)
+                                                                      + np.log(review_count_reviews) + 1)
         user_ratings[user] = rating
+        user_grades[user] = parse_avg[user]
 
     for user in all_groups:
         if test_gender_ratings[user] == 'female':
@@ -273,46 +289,80 @@ def main():
                                                    + np.log(review_count)
                                                    + np.log(fuc_count) + 1))
         user_ratings[user] = rating
+        user_grades[user] = parse_avg[user]
 
     #business stuff, fill this
     for business in training_review_businesses:
-        rating = mean_stars
+        rating_count = len(business_stars_list[business])
+        business_avg = business_star_avg[business]
+        rating = (mean_stars + business_avg*np.log(rating_count))/(1 + np.log(rating_count))
         business_ratings[business] = rating
+        business_grades[business] = business_grade_avg[business]
+
     for business in training_businesses:
-        '''business_stars = id_stars_dict[business]
-        review_count = id_reviews[user]
-        rating = (np.log(review_count)*business_stars + user_gender_rating)/(np.log(review_count) + 1)
-        business_ratings[business] = rating'''
+        categories = training_categories[business]
+        category_grade_list = []
+        for category in categories:
+            try:
+                category_grade_list.append(grade_category_dict[category])
+            except KeyError:
+                continue
+        try:
+            category_grade_rating = sum(category_grade_list)/len(category_grade_list)
+        except ZeroDivisionError:
+            category_grade_rating = global_grade_mean
         rating = expected_business_rating[business]
         business_ratings[business] = rating
-    '''for business in test_businesses:
-        user_gender_rating = gender_ratings[user]
-        rating = user_gender_rating
-        user_ratings[user] = rating
-    for user in parse_review_businesses:
-        user_review_rating = parse_ratings[user]
-        user_stars = stars_average[user]
-        review_count = len(review_user_stars[user])
-        rating = user_review_rating
-    for user in (test_users and training_users):
-        user_gender_rating = gender_ratings[user]
-        user_stars = id_stars_dict[user]
-        review_count = id_reviews[user]
-        #rating =
-    for user in (parse_review_users and training_users):
-        user_review_rating = parse_ratings[user]
-        #rating =
-    for user in (parse_review_users and test_users):
-        review_count = test_count
-        user_gender_rating = gender_ratings[user]
-        #rating =
-    for user in all_groups:
-        user_gender_rating = gender_ratings[user]
-        user_review_rating = parse_ratings[user]
-        fuc_rating = fuc_rating_dict[user]
-        user_stars = id_stars_dict[user]
-        review_count = id_reviews[user]
-        #rating ='''
+        business_grades[business] = category_grade_rating
+
+    for business in test_businesses:
+        categories = test_categories[business]
+        category_grade_list = []
+        for category in categories:
+            try:
+                category_grade_list.append(grade_category_dict[category])
+            except KeyError:
+                continue
+        try:
+            category_grade_rating = sum(category_grade_list)/len(category_grade_list)
+        except ZeroDivisionError:
+            category_grade_rating = global_grade_mean
+        rating = expected_business_rating[business]
+        business_ratings[business] = rating
+        business_grades[business] = category_grade_rating
+
+    for business in set(test_businesses).intersection(training_businesses):
+        categories = training_categories[business]
+        category_grade_list = []
+        for category in categories:
+            try:
+                category_grade_list.append(grade_category_dict[category])
+            except KeyError:
+                continue
+        try:
+            category_grade_rating = sum(category_grade_list)/len(category_grade_list)
+        except ZeroDivisionError:
+            category_grade_rating = global_grade_mean
+        rating = expected_business_rating[business]
+        business_ratings[business] = rating
+        business_grades[business] = category_grade_rating
+
+    for business in set(test_businesses).intersection(training_review_businesses):
+        rating_count = len(business_stars_list[business])
+        business_avg = business_star_avg[business]
+        rating = (expected_business_rating[test_businesses]
+                  + business_avg*np.log(rating_count))/(1 + np.log(rating_count))
+        business_ratings[business] = rating
+        business_grades[business] = business_grade_avg[business]
+
+    for business in set(training_businesses).intersection(training_review_businesses):
+        rating_count = len(business_stars_list[business])
+        business_avg = business_star_avg[business]
+        rating = (expected_business_rating[business]
+                  + business_avg*np.log(rating_count))/(1 + np.log(rating_count))
+        business_ratings[business] = rating
+        business_grades[business] = business_grade_avg[business]
+
     with open('yelp_test_set_review.json') as file:
         final_data = [json.loads(entry) for entry in file]
         ratings = []
