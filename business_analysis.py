@@ -192,7 +192,6 @@ def group_diffs():
     grade_star_dict = {str(sorted_grades[4906]): sorted_stars[:4906]}
     for i in range(9906, len(sorted_stars), 5000):
         grade_star_dict[str(sorted_grades[i])] = sorted_stars[i-5000:i]
-        print(i)
     return grade_star_dict
 
 
