@@ -200,13 +200,14 @@ def group_diffs():
 
 
 def partitions():
-    return np.sort(list(group_diffs().keys()))
+    key_list = [float(key) for key in group_diffs().keys()]
+    return np.sort(key_list)
 
 
 def partition_mean_std():
     partition_list = partitions()
     diff_dict = group_diffs()
-    return {partition: (np.mean(diff_dict[partition]), np.std(diff_dict[partition]))
+    return {partition: (np.mean(diff_dict[str(partition)]), np.std(diff_dict[str(partition)]))
             for partition in partition_list}
 
 
