@@ -373,10 +373,10 @@ def main():
                 #calculate writing level difference
                 diff = user_grades[final_data[i]['user_id']] - business_grades[final_data[i]['business_id']]
                 #and then calculate expected contribution to star rating prediction for user business pair
-                partition = -3.83204579831
+                partition = -3.83205
                 for j in range(len(partitions)):
-                    if diff < partitions[i]:
-                        partition = partitions[i]
+                    if diff < partitions[j]:
+                        partition = partitions[j]
                     else:
                         partition = partitions[-1]
                 diff_score = partition_dict[str(partition)][0]
