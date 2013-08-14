@@ -207,7 +207,7 @@ def partitions():
 def partition_mean_std():
     partition_list = partitions()
     diff_dict = group_diffs()
-    return {partition: (np.mean(diff_dict[str(partition)]), np.std(diff_dict[str(partition)]))
+    return {str(partition): (np.mean(diff_dict[str(partition)]), np.std(diff_dict[str(partition)]))
             for partition in partition_list}
 
 
