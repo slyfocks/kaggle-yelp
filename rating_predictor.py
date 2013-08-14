@@ -139,6 +139,7 @@ def main():
     expected_business_rating = banal.predicted_business_rating()
     business_grade_avg = banal.id_grade_avg()
     partition_dict = banal.partition_mean_std()
+    partitions = sorted([float(key) for key in partition_dict.keys()])
 
     #for training_review_businesses only!
     business_star_avg = banal.id_star_avg()
@@ -372,14 +373,24 @@ def main():
                 #calculate writing level difference
                 diff = user_grades[final_data[i]['user_id']] - business_grades[final_data[i]['business_id']]
                 #and then calculate expected contribution to star rating prediction for user business pair
-                diff_score =
+                partition = -3.83204579831
+                for j in range(len(partitions)):
+                    if diff < partitions[i]:
+                        partition = partitions[i]
+                    else:
+                        partition = partitions[-1]
+                diff_score = partition_dict[str(partition)][0]
             except KeyError:
-                grade_diff_influence = 0
-            rating = ((user_ratings[final_data[i]['user_id']]
+                diff_score = 0
+            rating = (diff_score + (user_ratings[final_data[i]['user_id']]
                       + business_ratings[final_data[i]['business_id']])/2)
+            if rating > 5:
+                rating = 5.0
+            elif rating < 1:
+                rating = 1.0
             ratings.append({'RecommendationId': i+1, 'Stars': rating})
     keys = ['RecommendationId', 'Stars']
-    f = open('funnyusefulcool3.csv', 'w')
+    f = open('gradediffs.csv', 'w')
     dict_writer = csv.DictWriter(f, keys)
     dict_writer.writer.writerow(keys)
     dict_writer.writerows(ratings)
