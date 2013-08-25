@@ -388,9 +388,9 @@ def main():
                 rating = 5.0
             elif rating < 1:
                 rating = 1.0
-            ratings.append({'RecommendationId': i+1, 'Stars': rating})
-    keys = ['RecommendationId', 'Stars']
-    f = open('gradediffs.csv', 'w')
+            ratings.append({final_data[i]['review_id']: i+1, 'stars': rating})
+    keys = ['review_id', 'stars']
+    f = open('newgradediffs.csv', 'w')
     dict_writer = csv.DictWriter(f, keys)
     dict_writer.writer.writerow(keys)
     dict_writer.writerows(ratings)
