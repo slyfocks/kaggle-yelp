@@ -382,15 +382,15 @@ def main():
                 diff_score = partition_dict[str(partition)][0]
             except KeyError:
                 diff_score = 0
-            rating = (diff_score + (user_ratings[final_data[i]['user_id']]
-                      + business_ratings[final_data[i]['business_id']])/2)
+            rating = diff_score + (user_ratings[final_data[i]['user_id']]
+                      + business_ratings[final_data[i]['business_id']])/2
             if rating > 5:
                 rating = 5.0
             elif rating < 1:
                 rating = 1.0
             ratings.append({'review_id': final_data[i]['review_id'], 'stars': rating})
     keys = ['review_id', 'stars']
-    f = open('newgradediffs.csv', 'w')
+    f = open('newgradediffs1.csv', 'w')
     dict_writer = csv.DictWriter(f, keys)
     dict_writer.writer.writerow(keys)
     dict_writer.writerows(ratings)
