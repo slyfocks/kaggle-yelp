@@ -170,7 +170,6 @@ def main():
             user_gender_rating = unknown_mean
         else:
             user_gender_rating = both_mean
-        user_gender_rating = 3.775
         user_stars = id_stars_dict[user]
         review_count = id_reviews[user]
         #fuc rating given on 1-5 scale based on lms regression on funny, useful, cool ratings and star ratings
@@ -191,7 +190,6 @@ def main():
             user_gender_rating = unknown_mean
         else:
             user_gender_rating = both_mean
-        user_gender_rating = 3.775
         rating = user_gender_rating
         user_ratings[user] = rating
 
@@ -229,7 +227,6 @@ def main():
             user_gender_rating = unknown_mean
         else:
             user_gender_rating = both_mean
-        user_gender_rating = 3.775
         user_stars = id_stars_dict[user]
         user_stars_review = review_stars_average[user]
         review_count = id_reviews[user]
@@ -253,7 +250,6 @@ def main():
             user_gender_rating = unknown_mean
         else:
             user_gender_rating = both_mean
-        user_gender_rating = 3.775
         try:
             user_review_rating = review_stars_average[user]
         except KeyError:
@@ -280,7 +276,6 @@ def main():
             user_gender_rating = unknown_mean
         else:
             user_gender_rating = both_mean
-        user_gender_rating = 3.775
         try:
             user_stars = id_stars_dict[user]
         except KeyError:
