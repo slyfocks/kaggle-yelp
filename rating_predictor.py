@@ -216,7 +216,8 @@ def main():
         fuc_count = total_fuc_ratings[user] + 1
         rating = ((np.log(review_count)*user_stars + user_gender_rating
                   + fuc_rating*np.log(fuc_count))/(np.log(review_count) + np.log(fuc_count) + 1))
-        rating = fuc_rating
+        rating = ((np.log(review_count)*user_stars + user_gender_rating
+                 )/(np.log(review_count) + 1))
         user_ratings[user] = rating
 
     for user in set(parse_review_users).intersection(training_users):
@@ -239,7 +240,11 @@ def main():
                   + fuc_rating*np.log(fuc_count))/(np.log(review_count_reviews)
                                                    + np.log(review_count)
                                                    + np.log(fuc_count) + 1))
-        rating = fuc_rating
+        rating = ((user_stars*np.log(review_count)
+                  + user_stars_review*np.log(review_count_reviews) + user_gender_rating
+                  )/(np.log(review_count_reviews)
+                                                   + np.log(review_count)
+                                                    + 1))
         user_ratings[user] = rating
         user_grades[user] = parse_avg[user]
 
@@ -292,7 +297,11 @@ def main():
                   + fuc_rating*np.log(fuc_count))/(2*np.log(review_count_reviews)
                                                    + np.log(review_count)
                                                    + np.log(fuc_count) + 1))
-        rating = fuc_rating
+        rating = ((user_stars*np.log(review_count)
+                  + user_stars_review*np.log(review_count_reviews) + user_gender_rating
+                  )/(2*np.log(review_count_reviews)
+                                                   + np.log(review_count)
+                                                    + 1))
         user_ratings[user] = rating
         user_grades[user] = parse_avg[user]
 
@@ -385,7 +394,7 @@ def main():
                 diff_score = partition_dict[str(partition)][0]
             except KeyError:
                 diff_score = 0
-            rating = diff_score/4 + (user_ratings[final_data[i]['user_id']]
+            rating = (user_ratings[final_data[i]['user_id']]
                                   + business_ratings[final_data[i]['business_id']])/2
             if rating > 5:
                 rating = 5.0
