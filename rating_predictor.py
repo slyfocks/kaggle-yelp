@@ -216,6 +216,7 @@ def main():
         fuc_count = total_fuc_ratings[user] + 1
         rating = ((np.log(review_count)*user_stars + user_gender_rating
                   + fuc_rating*np.log(fuc_count))/(np.log(review_count) + np.log(fuc_count) + 1))
+        rating = fuc_rating
         user_ratings[user] = rating
 
     for user in set(parse_review_users).intersection(training_users):
@@ -238,6 +239,7 @@ def main():
                   + fuc_rating*np.log(fuc_count))/(np.log(review_count_reviews)
                                                    + np.log(review_count)
                                                    + np.log(fuc_count) + 1))
+        rating = fuc_rating
         user_ratings[user] = rating
         user_grades[user] = parse_avg[user]
 
@@ -290,6 +292,7 @@ def main():
                   + fuc_rating*np.log(fuc_count))/(2*np.log(review_count_reviews)
                                                    + np.log(review_count)
                                                    + np.log(fuc_count) + 1))
+        rating = fuc_rating
         user_ratings[user] = rating
         user_grades[user] = parse_avg[user]
 
@@ -390,7 +393,7 @@ def main():
                 rating = 1.0
             ratings.append({'review_id': final_data[i]['review_id'], 'stars': rating})
     keys = ['review_id', 'stars']
-    f = open('newgradediffs8.csv', 'w')
+    f = open('newfuc.csv', 'w')
     dict_writer = csv.DictWriter(f, keys)
     dict_writer.writer.writerow(keys)
     dict_writer.writerows(ratings)
